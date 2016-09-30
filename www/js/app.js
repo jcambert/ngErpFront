@@ -3,7 +3,23 @@
 // angular.module is a global place for creating, registering and retrieving Angular modules
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
-angular.module('starter', ['ionic'])
+angular.module('ngErp', ['ionic'])
+
+.config(function($stateProvider,$urlRouterProvider){
+    console.dir('config application');
+    $stateProvider
+        .state('commercial',{
+            url:'/commercial',
+            templateUrl:'templates/commercial.html'
+            
+        })
+        .state('deviseur',{
+            url:'/deviseur',
+                template:'<div>DEVISEUR</div>'
+            
+        });
+    $urlRouterProvider.otherwise('/commercial');
+})
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
