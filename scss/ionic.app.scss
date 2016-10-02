@@ -21,3 +21,10 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 // Include all of Ionic
 @import "www/lib/ionic/scss/ionic";
 
+/* front End Custom */
+
+@each $iconsize in 14,12,16,24,48,64,96 {
+  .size-#{$iconsize} {
+    font-size: #{$iconsize}px;
+  }
+}

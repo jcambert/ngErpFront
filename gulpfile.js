@@ -11,11 +11,14 @@ var paths = {
   sass: ['./scss/**/*.scss']
 };
 
+
+gulp.task('serve:before', ['default','watch']);
 gulp.task('default', ['sass']);
 
 gulp.task('sass', function(done) {
+    console.log('running task [sass]');
   gulp.src('./scss/ionic.app.scss')
-    .pipe(sass())
+    .pipe(sass({errLogToConsole: true}))
     .on('error', sass.logError)
     .pipe(gulp.dest('./www/css/'))
     .pipe(minifyCss({

@@ -6,6 +6,9 @@
   },
   "dependencies": {
     "lodash": "^4.16.2",
-    "angular-toastr": "^2.1.1"
+    "angular-toastr": "^2.1.1",
+    "api-check": "^7.5.5",
+    "angular-formly": "^8.4.0",
+    "angular-formly-templates-ionic": "^1.2.2"
   }
 }
