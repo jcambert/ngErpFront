@@ -18,13 +18,35 @@ $dark:                            #444 !default;
 // The path for our ionicons font files, relative to the built CSS in www/css
 $ionicons-font-path: "../lib/ionic/fonts" !default;
 
+$cardWidth:350;
+$cardHeight:150;
+
 // Include all of Ionic
 @import "www/lib/ionic/scss/ionic";
 
 /* front End Custom */
-
+//Icon Size
 @each $iconsize in 14,12,16,24,48,64,96 {
-  .size-#{$iconsize} {
+  i.size-#{$iconsize} {
     font-size: #{$iconsize}px;
   }
+}
+//End Icon Size
+
+//Card Container
+.card-container{
+    display:flex;
+    align-items: center; 
+    justify-content: space-around;
+    flex-wrap: wrap;
+    background-color: #B4FF4C;
+    .menu-card{
+        background-color: #5A7F28;
+        
+        padding: 8px;
+        .list a {
+            width:342px;
+            height:142px;
+        }
+    }
 }

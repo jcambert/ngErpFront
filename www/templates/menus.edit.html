@@ -1,0 +1,40 @@
+<ion-view view-title="{{state.current.data.title}}" >
+    <ion-content>
+        <div class="list card">
+            <div class="item item-divider">
+               Edition du menu {{menu.name}}
+            </div>
+            <div class="item item-text-wrap">
+                 <div class="list">
+                    <label class="item item-input item-floating-label">
+                        <span class="input-label">Nom</span>
+                        <input type="text" placeholder="Nom" ng-model="menu.name">
+                    </label>
+                </div>
+            </div>
+            <div class="item item-divider">
+               <a  href="#" ng-click="addItem()">
+                    <i class="ion-plus size-24"></i>
+                </a>
+            </div>
+            
+            <div class="item item-text-wrap">
+                <ion-list  show-delete="false" can-swipe="true" >  
+                    <ion-item  ng-repeat="item in menu.items" ng-click="editItem($index)">
+                        {{$index}}-{{item.text}}
+                        <ion-option-button class="button-light icon ion-heart"></ion-option-button>
+                        <ion-option-button class="button-assertive icon ion-trash-a" ng-click="menu.items.splice($index, 1)"></ion-option-button>
+                    </ion-item>
+                </ion-list>
+            </div>
+            
+            <div class="item item-divider">
+                 <a  href="#" ng-click="save()">
+                    <i class="ion-android-send size-24"></i>
+                </a>
+
+            </div>
+        </div>
+   
+    </ion-content>
+</ion-view>

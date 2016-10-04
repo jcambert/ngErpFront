@@ -1,0 +1,9 @@
+<ion-view view-title="{{state.current.data.title}}" >
+    <ion-content>
+        <div class="card-container" ng-repeat="item in menu.items">
+            <menu-card-item icon="{{item.icon}}" sref="{{item.state}}" text="{{item.text}}"></menu-card-item>
+        </div>
+       
+    </ion-content>
+    
+</ion-view>
