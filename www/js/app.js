@@ -121,10 +121,44 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic'])
         })
 }])
 
-.controller('MenuListController',['$scope','$state','MenuService',function($scope,$state,MenuService){
+.controller('MenuListController',['$scope','$state','MenuService','$ionicModal','toastr',function($scope,$state,MenuService,$ionicModal,toastr){
     $scope.state=$state;
     $scope.menus = {}
-    MenuService.list().then(function(menus){$scope.menus=menus;console.dir(menus);})
+    reload();
+    function reload(){
+        MenuService.list().then(function(menus){$scope.menus=menus;console.dir(menus);});
+    }
+    $scope.addItem = function(){
+        $scope.currentItem=MenuService.create();
+        console.dir($scope.currentItem);
+        $scope.editItem();
+    }
+    $scope.deleteItem = function(index){
+        var name=$scope.menus[index].name;
+        MenuService.delete($scope.menus[index].id).then(function(){
+            toastr.success('Menu '+name +' supprimé avec succès');
+            reload();
+        })
+    }
+    $scope.editItem = function(index){
+        if( angular.isDefined(index)){
+            $scope.currentItem=angular.copy($scope.menus[index]);
+        }
+        $scope.currentItem.name="toto";
+        $scope.modal.show();
+    }
+    $scope.save = function(){
+            MenuService.upsert($scope.currentItem).then(function(){
+            reload();
+            $scope.modal.hide();
+        })
+    }
+     $ionicModal.fromTemplateUrl('templates/menus.menu.edit.html', {
+        scope: $scope,
+        animation: 'slide-in-up'
+    }).then(function(modal) {
+        $scope.modal = modal;
+    });
 }])
 
 .controller('MenuEditController',['$scope','$state','$stateParams','MenuService','$ionicModal','toastr',function($scope,$state,$stateParams,MenuService,$ionicModal,toastr){

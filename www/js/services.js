@@ -6,6 +6,18 @@ angular.module('ngErp')
     })
     var Item=sailsResource('MenuItem',{});
     
+    this.delete = function(id){
+        var d=$q.defer();
+        this.byId(id)
+            .then(function(item){
+                item.$delete(function(){d.resolve();})
+            }) 
+            .catch(function(err){
+                d.reject(err);
+            });
+        return d.promise;
+    }
+    
     this.list = function(){
         var d=$q.defer();
         Menu.query(
