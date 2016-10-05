@@ -73,11 +73,11 @@
                 <ion-item menu-close ui-sref="home.deviseur">
                     <i class="ion-social-euro size-14"></i>
                     Deviseur
-                </ion-item>
-                <ion-item menu-close ui-sref="home.settings">
+                </ion-item>-->
+                <ion-item menu-close ui-sref="home.settings" ng-if="menus.length==0">
                     <i class="ion-gear-b size-14"></i>
                     Parametres
-                </ion-item>-->
+                </ion-item>
                 <ion-item menu-close ui-sref="{{menu.state}}" ng-repeat="menu in menus">
                     <i class="{{menu.icon}} size-14"></i>
                     {{menu.name}}

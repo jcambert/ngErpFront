@@ -4,9 +4,12 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-datepicker'])
-
-.config(['$stateProvider','$urlRouterProvider','toastrConfig','ionicDatePickerProvider',function($stateProvider,$urlRouterProvider,toastrConfig,ionicDatePickerProvider){
+.constant('Paths',{template:'templates/'})
+.config(['$stateProvider','$urlRouterProvider','toastrConfig','ionicDatePickerProvider','erpStateProvider',function($stateProvider,$urlRouterProvider,toastrConfig,ionicDatePickerProvider,erpStateProvider){
     console.dir('config application');
+    
+    
+    
     $stateProvider
         .state('home',{
             url:'',
@@ -64,7 +67,7 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
             
         })
         
-        .state('home.dp',{
+        /*.state('home.dp',{
             url:'/dp',
             templateUrl:'templates/dp/list.html',
             controller:'DpListController',
@@ -72,17 +75,21 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
                 title:'Gestion des offres de prix'
             }
             
-        })
-        .state('home.dp-edit',{
+        })*/
+        /*.state('home.dp-edit',{
             url:'/dpedit/:id',
             templateUrl:'templates/dp/edit.html',
             controller:'DpEditController',
             data:{
                 title:'Edition d\'une offre de prix'
             }
-        })
+        })*/
         ;
-    $urlRouterProvider.otherwise('/');
+        
+        //erpStateProvider.addState({name:'home.dp',url:'/dp',templateUrl:'dp/list.html',controller:'DpListController',title:'Gestion des dps',dataService:'DpService'});
+        erpStateProvider.addStandardState('dp');
+        //erpStateProvider.addState({name:'home.dp-edit',url:'/dpedit/:id',templateUrl:'dp/edit.html',controller:'DpEditController',title:'Edition d\'une offre de prix',dataService:'DpService'});
+        $urlRouterProvider.otherwise('/');
     
      angular.extend(toastrConfig, {
 
@@ -239,7 +246,8 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
         
     }
 }])
-.controller('SubmenuController',['$scope','MenuService','menu',function($scope,MenuService,menu){
+.controller('SubmenuController',['$scope','$state','MenuService','menu',function($scope,$state,MenuService,menu){
+    $scope.state=$state;
     MenuService.byName(menu)
         .then(function(menu){
              console.dir(menu);
@@ -247,10 +255,11 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
         });
 }])
 
-.controller('DpListController',['$scope','$state','$stateParams','DpService','$ionicModal','toastr',function($scope,$state,$stateParams,DpService,$ionicModal,toastr){
+.controller('ListController',['Paths','$injector','$scope','$state','$stateParams','$ionicModal','toastr','modelName',function(paths,$injector,$scope,$state,$stateParams,$ionicModal,toastr,modelName){
     $scope.state=$state;
-    
-     $ionicModal.fromTemplateUrl('templates/dp/add.html', {
+    console.dir(modelName);
+    var dataService=$injector.get( modelName+'Service');
+     $ionicModal.fromTemplateUrl(paths.template+modelName+'/add.html', {
         scope: $scope,
         animation: 'slide-in-up'
     }).then(function(modal) {
@@ -258,7 +267,7 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
     });
     
     $scope.addItem = function(){
-        DpService.create().then(function(item){
+        dataService.create().then(function(item){
             $scope.currentItem=item;        
             $scope.modal.show();
         })
@@ -266,22 +275,22 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
     
    
     $scope.saveItem = function(){
-        DpService.save($scope.currentItem).then(function(){
+        dataService.save($scope.currentItem).then(function(){
             $scope.modal.hide();
         })
     }
     
     function reload(){
-        DpService.all().then(function(items){$scope.items=items;});
+        dataService.all().then(function(items){$scope.items=items;});
     }
     
     reload();
 }])
 
-.controller('DpEditController',['$scope','$state','$stateParams','DpService','$ionicModal','toastr','ionicDatePicker',function($scope,$state,$stateParams,DpService,$ionicModal,toastr,ionicDatePicker){
+.controller('dpEditController',['$scope','$state','$stateParams','dpService','$ionicModal','toastr','ionicDatePicker','dataService',function($scope,$state,$stateParams,dpService,$ionicModal,toastr,ionicDatePicker,dataService){
     $scope.state = $state;
     
-    DpService.getById($stateParams.id).then(function(item){
+    dpService.getById($stateParams.id).then(function(item){
         $scope.item=item;
     });
     
@@ -297,7 +306,7 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
     };
     
     $scope.saveItem = function(){
-        DpService.save($scope.item).then(function(item){
+        dpService.save($scope.item).then(function(item){
             $scope.item=item;
             toastr.success('Offre de prix N°'+item.numero+' enregistrée');
         });

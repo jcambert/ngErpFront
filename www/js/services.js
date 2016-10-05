@@ -1,4 +1,34 @@
 angular.module('ngErp')
+.provider('erpState',['$stateProvider','Paths','$injector',function($stateProvider,Paths,$injector){
+    var self=this;
+    self.addState = function(state){
+        console.dir(state)
+        $stateProvider.state(state.name,{
+                    url:state.url,
+                    templateUrl:Paths.template+state.templateUrl,
+                    controller:state.controller,
+                    data:{
+                        title:state.title
+                    },
+                    resolve:{
+                        //dataService:function(){return state.dataService;},
+                        modelName:function() {return state.model;}
+                    }
+                });
+    }
+     
+    return{
+        addStandardState:function(state){
+            this.addState({model:'dp', name:'home.'+state, url:'/'+state,templateUrl:state+'/list.html',controller:'ListController',title:'Liste des '+state,dataService:state+'Service'});
+            this.addState({model:'dp', name:'home.'+state+'-edit', url:'/'+state+'edit/:id',templateUrl:state+'/edit.html',controller:state+'EditController',title:'Gestion :'+state,dataService:state+'Service'});
+        },
+        addState:this.addState,
+        $get:function(){
+            
+        }
+    }
+}])
+
 .service('MenuService',['sailsResource','toastr','$log','$q',function(sailsResource,toastr,$log,$q){
     var Menu=sailsResource('Menu',{
         byname:{method:'GET',url:'/menu/byname/:name',isArray:false},
@@ -133,7 +163,7 @@ angular.module('ngErp')
     }
 }])
 
-.service('DpService',['sailsResource','toastr','$log','$q',function(sailsResource,toastr,$log,$q){
+.service('dpService',['sailsResource','toastr','$log','$q',function(sailsResource,toastr,$log,$q){
     var DP = sailsResource('dp',{
         
     });
