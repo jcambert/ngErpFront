@@ -10,6 +10,7 @@
     "api-check": "^7.5.5",
     "angular-formly": "^8.4.0",
     "angular-formly-templates-ionic": "^1.2.2",
-    "angular-resource-sails": "^1.2.2"
+    "angular-resource-sails": "^1.2.2",
+    "ionic-datepicker": "^1.2.1"
   }
 }

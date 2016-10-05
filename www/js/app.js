@@ -3,9 +3,9 @@
 // angular.module is a global place for creating, registering and retrieving Angular modules
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
-angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic'])
+angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-datepicker'])
 
-.config(function($stateProvider,$urlRouterProvider,toastrConfig){
+.config(['$stateProvider','$urlRouterProvider','toastrConfig','ionicDatePickerProvider',function($stateProvider,$urlRouterProvider,toastrConfig,ionicDatePickerProvider){
     console.dir('config application');
     $stateProvider
         .state('home',{
@@ -62,7 +62,26 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic'])
                 title:'Gestion Quotation'
             }
             
-        });
+        })
+        
+        .state('home.dp',{
+            url:'/dp',
+            templateUrl:'templates/dp/list.html',
+            controller:'DpListController',
+            data:{
+                title:'Gestion des offres de prix'
+            }
+            
+        })
+        .state('home.dp-edit',{
+            url:'/dpedit/:id',
+            templateUrl:'templates/dp/edit.html',
+            controller:'DpEditController',
+            data:{
+                title:'Edition d\'une offre de prix'
+            }
+        })
+        ;
     $urlRouterProvider.otherwise('/');
     
      angular.extend(toastrConfig, {
@@ -72,7 +91,26 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic'])
             progressbar: 'templates/progressbar/progressbar.html'
         }
     });
-})
+    var datePickerObj = {
+      inputDate: new Date(),
+      titleLabel: 'Choisissez une Date',
+      setLabel: 'Set',
+      todayLabel: 'Aujourd\'hui',
+      closeLabel: 'Fermer',
+      mondayFirst: false,
+      weeksList: ["D", "L", "M", "M", "J", "V", "S"],
+      monthsList: ["Jan", "Fev", "Mars", "Avril", "Mai", "Juin", "Juil", "Aout", "Sept", "Oct", "Nov", "Dec"],
+      templateType: 'popup',
+      from: new Date(2012, 8, 1),
+      to: new Date(2018, 8, 1),
+      showTodayButton: true,
+      dateFormat: 'dd MMMM yyyy',
+      closeOnSelect: false,
+      disableWeekdays: []
+    };
+    ionicDatePickerProvider.configDatePicker(datePickerObj);
+    
+}])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
@@ -92,7 +130,9 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic'])
   });
 })
 
-
+.controller('LeftMenuController',['$scope','MenuService', function($scope,MenuService){
+    MenuService.getLeftMenu().then(function(menus){$scope.menus=menus;console.dir(menus);});
+}])
 .controller('SettingsController',['$scope','$state','MenuService', function($scope,$state,MenuService){
     var defaultMenu={
         name:'settings',
@@ -144,14 +184,14 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic'])
         if( angular.isDefined(index)){
             $scope.currentItem=angular.copy($scope.menus[index]);
         }
-        $scope.currentItem.name="toto";
+        
         $scope.modal.show();
     }
     $scope.save = function(){
-            MenuService.upsert($scope.currentItem).then(function(){
+        MenuService.upsert($scope.currentItem).then(function(){
             reload();
             $scope.modal.hide();
-        })
+        });
     }
      $ionicModal.fromTemplateUrl('templates/menus.menu.edit.html', {
         scope: $scope,
@@ -205,5 +245,62 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic'])
              console.dir(menu);
             $scope.menu=menu;
         });
+}])
+
+.controller('DpListController',['$scope','$state','$stateParams','DpService','$ionicModal','toastr',function($scope,$state,$stateParams,DpService,$ionicModal,toastr){
+    $scope.state=$state;
+    
+     $ionicModal.fromTemplateUrl('templates/dp/add.html', {
+        scope: $scope,
+        animation: 'slide-in-up'
+    }).then(function(modal) {
+        $scope.modal = modal;
+    });
+    
+    $scope.addItem = function(){
+        DpService.create().then(function(item){
+            $scope.currentItem=item;        
+            $scope.modal.show();
+        })
+    }
+    
+   
+    $scope.saveItem = function(){
+        DpService.save($scope.currentItem).then(function(){
+            $scope.modal.hide();
+        })
+    }
+    
+    function reload(){
+        DpService.all().then(function(items){$scope.items=items;});
+    }
+    
+    reload();
+}])
+
+.controller('DpEditController',['$scope','$state','$stateParams','DpService','$ionicModal','toastr','ionicDatePicker',function($scope,$state,$stateParams,DpService,$ionicModal,toastr,ionicDatePicker){
+    $scope.state = $state;
+    
+    DpService.getById($stateParams.id).then(function(item){
+        $scope.item=item;
+    });
+    
+    $scope.pickdate = function(){
+         var ipObj1 = {
+            callback: function (val) {  //Mandatory
+                console.log('Return value from the datepicker popup is : ' + val, new Date(val));
+                $scope.item.datearendreprevue = new Date(val);
+            },
+            
+        };
+        ionicDatePicker.openDatePicker(ipObj1);
+    };
+    
+    $scope.saveItem = function(){
+        DpService.save($scope.item).then(function(item){
+            $scope.item=item;
+            toastr.success('Offre de prix N°'+item.numero+' enregistrée');
+        });
+    }
 }])
 ;

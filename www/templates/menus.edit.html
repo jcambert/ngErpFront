@@ -22,7 +22,7 @@
                 <ion-list  show-delete="false" can-swipe="true" >  
                     <ion-item  ng-repeat="item in menu.items" ng-click="editItem($index)">
                         {{$index}}-{{item.text}}
-                        <ion-option-button class="button-light icon ion-heart"></ion-option-button>
+                        <!--<ion-option-button class="button-light icon ion-heart"></ion-option-button>-->
                         <ion-option-button class="button-assertive icon ion-trash-a" ng-click="menu.items.splice($index, 1)"></ion-option-button>
                     </ion-item>
                 </ion-list>

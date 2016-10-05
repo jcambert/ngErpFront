@@ -3,6 +3,7 @@ angular.module('ngErp')
     var Menu=sailsResource('Menu',{
         byname:{method:'GET',url:'/menu/byname/:name',isArray:false},
         upsert:{method:'POST',url:'/menu/'},
+        left:{method:'GET',url:'/menu/left',isArray:true}
     })
     var Item=sailsResource('MenuItem',{});
     
@@ -118,4 +119,67 @@ angular.module('ngErp')
         return d.promise;
     }
     
+    
+    this.getLeftMenu = function(){
+        var d=$q.defer();
+        Menu.left(
+            function(menus){d.resolve(menus);},
+            function(err){
+                $log.log(err);
+                toastr.error('Impossible de recuperer le menu à gauche');
+                d.reject(err);
+            });
+        return d.promise;
+    }
 }])
+
+.service('DpService',['sailsResource','toastr','$log','$q',function(sailsResource,toastr,$log,$q){
+    var DP = sailsResource('dp',{
+        
+    });
+    
+    this.all = function(){
+        var d=$q.defer();
+        DP.query(
+            function(items){d.resolve(items);},
+            function(err){
+                $log.log(err);
+                toastr.error('Impossible de recuperer les offres de prix');
+                d.reject(err);
+            }
+        )
+        return d.promise;
+    };
+    
+    this.create = function(){
+        return $q(function(resolve, reject) {
+            resolve(new DP());
+        });
+    };
+    
+    this.save = function(item){
+        var d=$q.defer();
+        item.$save(
+            function(item){ d.resolve(item);},
+            function(err){
+                $log.log(err);
+                toastr.error('Impossible de sauver l\'offre de prix N°:'+item.numero);
+                d.reject(err);
+            }
+        );
+        return d.promise;
+    }
+    
+    this.getById = function(id){
+        var d=$q.defer();
+        DP.get({id:id},
+            function(item){d.resolve(item);},
+            function(err){
+                 $log.log(err);
+                toastr.error('Impossible de recuperer l\'offre de prix id:'+id);
+                d.reject(err);
+            });
+        return d.promise;
+    }
+}])
+;

@@ -5,12 +5,21 @@
     </ion-header-bar>
     <ion-content class="padding">
         <div class="list">
-        <label class="item item-input">
-            <span class="input-label">Item</span>
-            <input ng-model="currentItem.name" type="text" required>
-        </label>
-       
-        <button class="button button-full button-positive" ng-click="save()">Sauver</button>
+            <label class="item item-input">
+                <span class="input-label">Item</span>
+                <input ng-model="currentItem.name" type="text" required>
+            </label>
+            <label class="item item-input">
+                <span class="input-label">Icone</span>
+                <input ng-model="currentItem.icon" type="text">
+            </label>
+            <label class="item item-input">
+                <span class="input-label">Etat</span>
+                <input ng-model="currentItem.state" type="text">
+            </label>
+            <ion-toggle ng-model="currentItem.left"  toggle-class="toggle-calm">Menu à gauche</ion-toggle>
+            <ion-toggle ng-model="currentItem.center" toggle-class="toggle-calm">Menu au centre</ion-toggle>
+            <button class="button button-full button-positive" ng-click="save()">Sauver</button>
         </div>
     </ion-content>
 </ion-modal-view>
