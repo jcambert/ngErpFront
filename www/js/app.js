@@ -3,7 +3,8 @@
 // angular.module is a global place for creating, registering and retrieving Angular modules
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
-angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-datepicker'])
+
+angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-datepicker','angularMoment'])
 .constant('Paths',{template:'templates/'})
 .config(['$stateProvider','$urlRouterProvider','toastrConfig','ionicDatePickerProvider','erpStateProvider',function($stateProvider,$urlRouterProvider,toastrConfig,ionicDatePickerProvider,erpStateProvider){
     console.dir('config application');
@@ -136,7 +137,38 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
     }
   });
 })
+.directive('erpViewList',['Paths','$compile', function(paths,$compile){
+    return {
+        restrict:'E',
+        replace:true,
+        transclude:true,
+        templateUrl:paths.template+'components/erpViewList.html',
+        
+        
+        
+    }
+}])
 
+.directive('erpViewListContent',['Paths',function(paths){
+    return{
+        restrict:'E',
+        replace:true,
+        transclude:'element',
+        templateUrl:paths.template+'components/erpViewListContent.html',
+        scope:{
+            item:'='
+        },
+        link:function(scope,element,attrs,ctrl,transclude){
+          // console.dir(element.html());
+            transclude(scope, function (clone) {
+                    // be sure elements are inserted
+                // into html before linking
+                console.dir(clone.html());
+                element.replaceWith(clone);
+            });
+        }
+    }
+}])
 .controller('LeftMenuController',['$scope','MenuService', function($scope,MenuService){
     MenuService.getLeftMenu().then(function(menus){$scope.menus=menus;console.dir(menus);});
 }])
@@ -257,7 +289,7 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
 
 .controller('ListController',['Paths','$injector','$scope','$state','$stateParams','$ionicModal','toastr','modelName',function(paths,$injector,$scope,$state,$stateParams,$ionicModal,toastr,modelName){
     $scope.state=$state;
-    console.dir(modelName);
+    
     var dataService=$injector.get( modelName+'Service');
      $ionicModal.fromTemplateUrl(paths.template+modelName+'/add.html', {
         scope: $scope,
@@ -280,6 +312,14 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
         })
     }
     
+    $scope.editItem = function(id){
+        $state.go('home.'+modelName+'-edit',{id:id});
+    }
+    
+    $scope.detailItem = function(id){
+        $state.go('home.'+modelName+'-detail',{id:id});
+    }
+    
     function reload(){
         dataService.all().then(function(items){$scope.items=items;});
     }
@@ -287,18 +327,19 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
     reload();
 }])
 
-.controller('dpEditController',['$scope','$state','$stateParams','dpService','$ionicModal','toastr','ionicDatePicker','dataService',function($scope,$state,$stateParams,dpService,$ionicModal,toastr,ionicDatePicker,dataService){
+.controller('EditController',['Paths','$injector','$scope','$state','$stateParams','$ionicModal','toastr','ionicDatePicker','modelName','moment',function(paths,$injector,$scope,$state,$stateParams,$ionicModal,toastr,ionicDatePicker,modelName,moment){
     $scope.state = $state;
-    
-    dpService.getById($stateParams.id).then(function(item){
+    var dataService=$injector.get( modelName+'Service');
+    dataService.getById($stateParams.id).then(function(item){
         $scope.item=item;
     });
     
-    $scope.pickdate = function(){
+    $scope.pickdate = function(field){
          var ipObj1 = {
-            callback: function (val) {  //Mandatory
-                console.log('Return value from the datepicker popup is : ' + val, new Date(val));
-                $scope.item.datearendreprevue = new Date(val);
+            callback: function (val) { 
+                //console.log('Return value from the datepicker popup is : ' + val, new Date(val));
+                $scope.item[field] = moment(new Date(val)).format('YYYY-MM-DD');
+                console.dir($scope.item[field] );
             },
             
         };
@@ -306,10 +347,16 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
     };
     
     $scope.saveItem = function(){
-        dpService.save($scope.item).then(function(item){
+        dataService.save($scope.item).then(function(item){
             $scope.item=item;
-            toastr.success('Offre de prix N°'+item.numero+' enregistrée');
+            toastr.success('Enregistré avec succès');
         });
     }
+}])
+
+.controller('DetailController',['Paths','$injector','$scope','$state','$stateParams','$ionicModal','toastr','ionicDatePicker','modelName',function(paths,$injector,$scope,$state,$stateParams,$ionicModal,toastr,ionicDatePicker,modelName){
+    $scope.state = $state;
+    var dataService=$injector.get( modelName+'Service');
+    
 }])
 ;

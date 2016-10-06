@@ -11,6 +11,8 @@
     "angular-formly": "^8.4.0",
     "angular-formly-templates-ionic": "^1.2.2",
     "angular-resource-sails": "^1.2.2",
-    "ionic-datepicker": "^1.2.1"
+    "ionic-datepicker": "^1.2.1",
+    "moment": "^2.15.1",
+    "angular-moment": "^1.0.0"
   }
 }

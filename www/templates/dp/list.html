@@ -1,20 +1,5 @@
 <ion-view view-title="{{state.current.data.title}}" >
-    <ion-content>
-        <ion-list can-swipe="true">
-              
-             <ion-item class="item item-divider">
-                 <a  href="#" ng-click="addItem()">
-                    <i class="ion-plus size-24"></i>
-                </a>
-             </ion-item>
-            <ion-item  ng-repeat="item in items" ui-sref="home.dp-edit({id:item.id})">
-                {{item.numero}}
-                    <!--<i class="icon ion-edit size-24"></i>-->
-                <ion-option-button class="button-light icon ion-edit" ui-sref="home.settings-menus-edit({id:menu.id})"></ion-option-button>
-                <ion-option-button class="button-assertive icon ion-trash-a" ng-click="deleteItem($index)"></ion-option-button>
-            </ion-item>
-        </ion-list>
-       
-    </ion-content>
-    
+    <erp-view-list>
+        <erp-view-list-content item="$parent.item"><i class="icon ion-edit size-24"></i> {{item.id}}  {{item.numero}}</erp-view-list-content>
+    </erp-view-list>
 </ion-view>

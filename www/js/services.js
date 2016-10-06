@@ -20,7 +20,8 @@ angular.module('ngErp')
     return{
         addStandardState:function(state){
             this.addState({model:'dp', name:'home.'+state, url:'/'+state,templateUrl:state+'/list.html',controller:'ListController',title:'Liste des '+state,dataService:state+'Service'});
-            this.addState({model:'dp', name:'home.'+state+'-edit', url:'/'+state+'edit/:id',templateUrl:state+'/edit.html',controller:state+'EditController',title:'Gestion :'+state,dataService:state+'Service'});
+            this.addState({model:'dp', name:'home.'+state+'-edit', url:'/'+state+'edit/:id',templateUrl:state+'/edit.html',controller:'EditController',title:'Gestion '+state,dataService:state+'Service'});
+            this.addState({model:'dp', name:'home.'+state+'-detail', url:'/'+state+'detail/:id',templateUrl:state+'/detail.html',controller:'DetailController',title:'Détail '+state,dataService:state+'Service'});
         },
         addState:this.addState,
         $get:function(){
@@ -189,6 +190,7 @@ angular.module('ngErp')
     
     this.save = function(item){
         var d=$q.defer();
+        //var cmd=angular.isDefined(item.id)?item.$save:item.$update;
         item.$save(
             function(item){ d.resolve(item);},
             function(err){
