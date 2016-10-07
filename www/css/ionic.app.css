@@ -9840,7 +9840,8 @@ i.size-96 {
 .card-container {
   display: flex;
   align-items: center;
-  justify-content: space-around;
+  justify-content: center;
+  flex-direction: row;
   flex-wrap: wrap;
   background-color: #B4FF4C; }
   .card-container .menu-card {

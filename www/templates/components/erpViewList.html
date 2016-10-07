@@ -1,6 +1,6 @@
 
     <ion-content>
-        <ion-list can-swipe="true">
+        <ion-list can-swipe="state.current.data.hasdetail || state.current.data.candelete ">
               
              <ion-item class="item item-divider">
                  <a  href="#" ng-click="addItem()">
@@ -11,8 +11,8 @@
                
                     <!--<i class="icon ion-edit size-24"></i>-->
                <ng-transclude></ng-transclude>
-                <ion-option-button class="button-light icon ion-edit" ng-click="detailItem(item.id)" ></ion-option-button>
-                <ion-option-button class="button-assertive icon ion-trash-a" ng-click="deleteItem($index)"></ion-option-button>
+                <ion-option-button ng-if="state.current.data.hasdetail" class="button-light icon ion-edit" ng-click="detailItem(item.id)" ></ion-option-button>
+                <ion-option-button ng-if="state.current.data.candelete" class="button-assertive icon ion-trash-a" ng-click="deleteItem($index)"></ion-option-button>
                 
             </ion-item>
         </ion-list>

@@ -37,8 +37,8 @@ $cardHeight:150;
 .card-container{
     display:flex;
     align-items: center; 
-    justify-content: space-around;
-    
+    justify-content: center;
+    flex-direction: row;
     flex-wrap: wrap;
     background-color: #B4FF4C;
     .menu-card{

@@ -1,0 +1,27 @@
+<ion-view view-title="{{state.current.data.title}}" >
+    <ion-content >
+        <ion-list>
+            <ion-item class="item item-divider">
+                 <a  href="#" ng-click="saveItem()">
+                    <i class="ion-android-send size-24"></i>
+                </a>
+                &nbsp;
+                 <a  href="#" ng-click="goBack()">
+                    <i class="ion-ios-arrow-back size-24"></i>
+                </a>
+             </ion-item>
+             <ion-item>
+                <label class="item item-input  item-floating-label"">
+                    <span class="input-label">Nom</span>
+                    <input placeholder="Nom" ng-model="item.nom" type="text" required>
+                </label>
+                <label class="item item-input  item-floating-label"">
+                    <span class="input-label">Densite Kg/m<sup>3</sup></span>
+                    <input placeholder="Densite Kg/m<sup>3</sup>" ng-model="item.densite" type="number" required>
+                </label>
+            </ion-item>
+            <!--<button class="button button-full button-positive" ng-click="saveItem()">Sauver</button>-->
+        </div>
+    </ion-content>
+    
+</ion-view>

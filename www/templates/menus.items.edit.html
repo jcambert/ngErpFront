@@ -5,17 +5,21 @@
     </ion-header-bar>
     <ion-content class="padding">
         <div class="list">
-        <label class="item item-input">
+        <label class="item item-input item-floating-label"">
             <span class="input-label">Nom</span>
-            <input ng-model="currentItem.text" type="text" required>
+            <input ng-model="currentItem.text" type="text" required placeholder="Nom">
         </label>
-        <label class="item item-input">
+        <label class="item item-input item-floating-label"">
             <span class="input-label">Icone</span>
-            <input ng-model="currentItem.icon" type="text">
+            <input ng-model="currentItem.icon" type="text" placeholder="Icone">
         </label>
-        <label class="item item-input">
+        <label class="item item-input item-floating-label"">
             <span class="input-label">Etat</span>
-            <input ng-model="currentItem.state" type="text">
+            <input ng-model="currentItem.state" type="text" placeholder="Etat">
+        </label>
+        <label class="item item-input item-floating-label"">
+            <span class="input-label">Options de Liste</span>
+            <input json ng-model="currentItem.listoptions" type="text" placeholder="Options de Liste">
         </label>
         <button class="button button-full button-positive" ng-click="saveItem()">Sauver</button>
         </div>

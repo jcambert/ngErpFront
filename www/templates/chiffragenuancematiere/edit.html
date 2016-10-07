@@ -1,0 +1,32 @@
+<ion-view view-title="{{state.current.data.title}}" ng-init="matieres=wrapper.allMatiere()">
+    <ion-content >
+        <ion-list>
+            <ion-item class="item item-divider">
+                 <a  href="#" ng-click="saveItem()">
+                    <i class="ion-android-send size-24"></i>
+                </a>
+                &nbsp;
+                 <a  href="#" ng-click="goBack()">
+                    <i class="ion-ios-arrow-back size-24"></i>
+                </a>
+             </ion-item>
+             <ion-item>
+                <label class="item item-input  item-floating-label">
+                    <span class="input-label">Nom</span>
+                    <input placeholder="Nom" ng-model="item.nom" type="text" required>
+                </label>
+                <label class="item item-input  item-floating-label">
+                    <span class="input-label">Prix &euro;/Kg</span>
+                    <input placeholder="Prix €/Kg" ng-model="item.prix" type="number" required>
+                </label>
+                <label class="item item-input  item-select"">
+                    <span class="input-label">Nuance Matière</span>
+                    <select ng-model="item.matiere" ng-options="matiere as matiere.nom for matiere in matieres track by matiere.id">
+                    </select>
+                </label>
+            </ion-item>
+            <!--<button class="button button-full button-positive" ng-click="saveItem()">Sauver</button>-->
+        </div>
+    </ion-content>
+    
+</ion-view>

@@ -1,0 +1,31 @@
+
+<ion-modal-view ng-init="matieres=wrapper.allMatiere()">
+    <ion-header-bar class="bar bar-header bar-positive">
+        <h1 class="title">{{currentItem.id?'Editer':'Ajouter'}}</h1>
+        <button class="button button-clear button-primary" ng-click="modal.hide()">Annuler</button>
+    </ion-header-bar>
+    <ion-content class="padding">
+        <ion-list>
+            <ion-item>
+                <label class="item item-input  item-floating-label">
+                    <span class="input-label">Nom</span>
+                    <input placeholder="Nom" ng-model="currentItem.nom" type="text" required>
+                </label>
+                <label class="item item-input  item-floating-label">
+                    <span class="input-label">Prix &euro;/Kg</span>
+                    <input placeholder="Prix €/Kg" ng-model="currentItem.prix" type="number" required>
+                </label>
+                <label class="item item-input  item-select"">
+                    <span class="input-label">Nuance Matière</span>
+                    <select ng-model="currentItem.matiere" ng-options="matiere as matiere.nom for matiere in matieres track by matiere.id">
+                        
+                        
+                    </select>
+                </label>
+            </ion-item>
+            <ion-item>  
+                <button class="button button-full button-positive" ng-click="saveItem()">Sauver</button>
+            </ion-item>
+        <ion-list>
+    </ion-content>
+</ion-modal-view>

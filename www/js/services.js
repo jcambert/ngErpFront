@@ -1,15 +1,42 @@
 angular.module('ngErp')
-.provider('erpState',['$stateProvider','Paths','$injector',function($stateProvider,Paths,$injector){
+.provider('erpState',['$stateProvider','Paths','$injector','StandardStates','SubmenusStates',function($stateProvider,Paths,$injector,StandardStates,SubmenusStates){
     var self=this;
-    self.addState = function(state){
-        console.dir(state)
+    self.registerStandardStates = function(){
+        angular.forEach(StandardStates,function(state){
+           self.addStandardState(state.name,state.data || {}); 
+        });
+    }
+    
+    self.registerSubmenus = function(){
+        angular.forEach(SubmenusStates,function(state){
+            $stateProvider.state('home.'+state.name,{
+                url:'/'+state.name,
+                cache:false,
+                templateUrl:'templates/submenus.html',
+                controller:'SubmenuController',
+                resolve:{
+                    menu:function(){return state.name;}
+                },
+                data:state.data || {title:state.name}
+                
+            })
+        })
+    }
+    
+    self.addStandardState= function(state,data){
+        this.addState({model:state, name:'home.'+state, url:'/'+state,templateUrl:state+'/list.html',controller:'ListController',title:'Liste des '+state,dataService:state+'Service'},data);
+        this.addState({model:state, name:'home.'+state+'-edit', url:'/'+state+'edit/:id',templateUrl:state+'/edit.html',controller:'EditController',title:'Gestion '+state,dataService:state+'Service'},data);
+        this.addState({model:state, name:'home.'+state+'-detail', url:'/'+state+'detail/:id',templateUrl:state+'/detail.html',controller:'DetailController',title:'Détail '+state,dataService:state+'Service'},data);
+    }
+    self.addState = function(state,data){
+        var defaultdata={title:state.title,hasdetail:true,candelete:true};
+        
         $stateProvider.state(state.name,{
                     url:state.url,
+                    cache: false,
                     templateUrl:Paths.template+state.templateUrl,
                     controller:state.controller,
-                    data:{
-                        title:state.title
-                    },
+                    data:angular.extend(defaultdata,data),
                     resolve:{
                         //dataService:function(){return state.dataService;},
                         modelName:function() {return state.model;}
@@ -18,12 +45,10 @@ angular.module('ngErp')
     }
      
     return{
-        addStandardState:function(state){
-            this.addState({model:'dp', name:'home.'+state, url:'/'+state,templateUrl:state+'/list.html',controller:'ListController',title:'Liste des '+state,dataService:state+'Service'});
-            this.addState({model:'dp', name:'home.'+state+'-edit', url:'/'+state+'edit/:id',templateUrl:state+'/edit.html',controller:'EditController',title:'Gestion '+state,dataService:state+'Service'});
-            this.addState({model:'dp', name:'home.'+state+'-detail', url:'/'+state+'detail/:id',templateUrl:state+'/detail.html',controller:'DetailController',title:'Détail '+state,dataService:state+'Service'});
-        },
+        addStandardState:this.addStandardState,
         addState:this.addState,
+        registerStandardStates:this.registerStandardStates,
+        registerSubmenus:this.registerSubmenus,
         $get:function(){
             
         }
@@ -33,6 +58,7 @@ angular.module('ngErp')
 .service('MenuService',['sailsResource','toastr','$log','$q',function(sailsResource,toastr,$log,$q){
     var Menu=sailsResource('Menu',{
         byname:{method:'GET',url:'/menu/byname/:name',isArray:false},
+        bystate:{method:'GET',url:'/menu/bystate/:state',isArray:false},
         upsert:{method:'POST',url:'/menu/'},
         left:{method:'GET',url:'/menu/left',isArray:true}
     })
@@ -124,7 +150,6 @@ angular.module('ngErp')
     
     this.saveItem = function(item){
          var d=$q.defer();
-         console.dir(item);
          if(!angular.isDefined(item.id))
             item.$save(
                 function(item){ d.resolve(item);},
@@ -162,8 +187,22 @@ angular.module('ngErp')
             });
         return d.promise;
     }
+    
+    this.getByState = function(state){
+        var d=$q.defer();
+        Menu.bystate({state:state},
+                function(menu){
+                    d.resolve(menu);
+                },
+                function(err){
+                     $log.log(err);
+                    toastr.error('Impossible de recuperer le menu de l\'etat:'+state);
+                    d.reject(err);
+            });
+        return d.promise;
+    }
 }])
-
+/*
 .service('dpService',['sailsResource','toastr','$log','$q',function(sailsResource,toastr,$log,$q){
     var DP = sailsResource('dp',{
         
@@ -213,5 +252,188 @@ angular.module('ngErp')
             });
         return d.promise;
     }
+}])
+
+.service('matiereService',['sailsResource','toastr','$log','$q',function(sailsResource,toastr,$log,$q){
+    var ITEM = sailsResource('matiere',{
+        
+    });
+    
+    this.all = function(){
+        var d=$q.defer();
+        ITEM.query({sort:{'nom':1}},
+            function(items){d.resolve(items);},
+            function(err){
+                $log.log(err);
+                toastr.error('Impossible de recuperer les matieres');
+                d.reject(err);
+            }
+        )
+        return d.promise;
+    };
+    
+    this.create = function(){
+        return $q(function(resolve, reject) {
+            resolve(new ITEM());
+        });
+    };
+    
+    this.save = function(item){
+        var d=$q.defer();
+        item.$save(
+            function(item){ d.resolve(item);},
+            function(err){
+                $log.log(err);
+                toastr.error('Impossible de sauver l\'offre de prix N°:'+item.numero);
+                d.reject(err);
+            }
+        );
+        return d.promise;
+    }
+    
+    this.getById = function(id){
+        var d=$q.defer();
+        ITEM.get({id:id},
+            function(item){d.resolve(item);},
+            function(err){
+                 $log.log(err);
+                toastr.error('Impossible de recuperer l\'offre de prix id:'+id);
+                d.reject(err);
+            });
+        return d.promise;
+    }
+}])
+
+
+.service('nuancematiereService',['sailsResource','toastr','$log','$q',function(sailsResource,toastr,$log,$q){
+    var ITEM = sailsResource('nuancematiere',{
+        
+    });
+    
+    this.all = function(){
+        var d=$q.defer();
+        ITEM.query(
+            function(items){d.resolve(items);},
+            function(err){
+                $log.log(err);
+                toastr.error('Impossible de recuperer les matieres');
+                d.reject(err);
+            }
+        )
+        return d.promise;
+    };
+    
+    this.create = function(){
+        return $q(function(resolve, reject) {
+            resolve(new ITEM());
+        });
+    };
+    
+    this.save = function(item){
+        var d=$q.defer();
+        item.$save(
+            function(item){ d.resolve(item);},
+            function(err){
+                $log.log(err);
+                toastr.error('Impossible de sauver l\'offre de prix N°:'+item.numero);
+                d.reject(err);
+            }
+        );
+        return d.promise;
+    }
+    
+    this.getById = function(id){
+        var d=$q.defer();
+        ITEM.get({id:id},
+            function(item){d.resolve(item);},
+            function(err){
+                 $log.log(err);
+                toastr.error('Impossible de recuperer l\'offre de prix id:'+id);
+                d.reject(err);
+            });
+        return d.promise;
+    }
+}])*/
+
+.factory('DataService',['sailsResource','toastr','$log','$q',function(sailsResource,toastr,$log,$q){
+    var ITEM = null;
+    this.modelName='';
+    this.init = function(modelName,options){
+        ITEM=sailsResource(modelName,options || {});
+        this.modelName = modelName;
+    }
+    this.all = function(options){
+        var toptions={}
+       
+       angular.extend(toptions, options);
+        
+        var d=$q.defer();
+        ITEM.query(toptions || {},
+            function(items){d.resolve(items);},
+            function(err){
+                $log.log(err);
+                toastr.error('Impossible de recuperer les matieres');
+                d.reject(err);
+            }
+        )
+        return d.promise;
+    };
+    
+    this.create = function(){
+        return $q(function(resolve, reject) {
+            resolve(new ITEM());
+        });
+    };
+    
+    this.save = function(item){
+        console.dir('saving '+ this.modelName);
+        var d=$q.defer();
+        item.$save(
+            function(item){ d.resolve(item);},
+            function(err){
+                $log.log(err);
+                toastr.error('Impossible de sauver l\'offre de prix N°:'+item.numero);
+                d.reject(err);
+            }
+        );
+        return d.promise;
+    }
+    
+    this.get = function(id){
+        var d=$q.defer();
+        ITEM.get({id:id},
+            function(item){d.resolve(item);},
+            function(err){
+                 $log.log(err);
+                toastr.error('Impossible de recuperer l\'offre de prix id:'+id);
+                d.reject(err);
+            });
+        return d.promise;
+    }
+    
+    
+    return{
+        init:this.init,
+        all:this.all,
+        create:this.create,
+        save:this.save,
+        get:this.get,
+        resource:function(){return ITEM;}
+        
+    }
+}])
+.service('matiereService',['sailsResource','toastr','$log','$q',function(sailsResource,toastr,$log,$q){
+    
+}])
+.service('chiffragenuancematiereService',['sailsResource','toastr','$log','$q',function(sailsResource,toastr,$log,$q){
+    var Mat = sailsResource('matiere',{});
+    
+
+    this.allMatiere = function(){
+        console.dir('query allmatiere()');
+        return Mat.query({sort:{nom:1}});
+    }
+  
+   
 }])
 ;
