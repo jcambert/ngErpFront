@@ -1,0 +1,44 @@
+
+<ion-view cache-view="false"  >
+    <ion-nav-title> {{ title }} </ion-nav-title>
+    <ion-content>
+        <ion-list>
+            
+            <ion-item class="item item-divider">
+                Edition du client {{item.nom}}
+                 <a  href="#" ng-click="saveItem()" ng-if="canSave()" class="pull-right">
+                    <i class="ion-android-send size-24"></i>
+                </a>
+                 <a  href="#" ng-click="goBack()" ng-if="canGoBack()" class="pull-right">
+                    <i class="ion-ios-arrow-back size-24"></i>
+                </a>
+             </ion-item>
+             <ion-item>
+                  <label class="item item-input-inset">
+                        <span class="input-label">Telephone</span>
+                        <input type="text" placeholder="Telephone" ng-model="item.telephone">
+                    </label>
+                    
+             </ion-item>
+             <ion-item class="item item-divider">
+               <a  href="#" ng-click="addItem('contacts','contact')">
+                    <i class="ion-plus size-24"></i>
+                </a>
+             </ion-item>
+             <ion-item>
+                  <ion-list  show-delete="false" can-swipe="true" >  
+                    <ion-item  ng-repeat="contact in item.contacts" ng-click="editItem('contacts','contact',$index)">
+                        <h4>{{contact.civilite}} {{contact.nom}} {{contact.prenom}}</h4>
+                        <p>{{contact.email}}</p>
+                        <!--<ion-option-button class="button-light icon ion-heart"></ion-option-button>-->
+                        <ion-option-button class="button-assertive icon ion-trash-a" ng-click="menu.items.splice($index, 1)"></ion-option-button>
+                    </ion-item>
+                </ion-list>
+             </ion-item>
+             
+        </ion-list>
+        
+   
+    </ion-content>
+</ion-view>
+

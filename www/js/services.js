@@ -25,11 +25,13 @@ angular.module('ngErp')
     
     self.addStandardState= function(state,data){
         this.addState({model:state, name:'home.'+state, url:'/'+state,templateUrl:state+'/list.html',controller:'ListController',title:'Liste des '+state,dataService:state+'Service'},data);
-        this.addState({model:state, name:'home.'+state+'-edit', url:'/'+state+'edit/:id',templateUrl:state+'/edit.html',controller:'EditController',title:'Gestion '+state,dataService:state+'Service'},data);
-        this.addState({model:state, name:'home.'+state+'-detail', url:'/'+state+'detail/:id',templateUrl:state+'/detail.html',controller:'DetailController',title:'Détail '+state,dataService:state+'Service'},data);
+        this.addState({model:state, name:'home.'+state+'-add',  url:'/'+state+'add',     templateUrl:state+'/form.html',controller:'FormController',title:'Gestion '+state,dataService:state+'Service'},angular.extend(data,{mode:'add'}));
+        this.addState({model:state, name:'home.'+state+'-edit', url:'/'+state+'edit/:id',templateUrl:state+'/form.html',controller:'FormController',title:'Gestion '+state,dataService:state+'Service'},angular.extend(data,{mode:'edit'}));
+        if(!angular.isDefined(data.hasdetail) || data.hasdetail)
+            this.addState({model:state, name:'home.'+state+'-detail', url:'/'+state+'detail/:id',templateUrl:state+'/detail.html',controller:'DetailController',title:'Détail '+state,dataService:state+'Service'},data);
     }
     self.addState = function(state,data){
-        var defaultdata={title:state.title,hasdetail:true,candelete:true};
+        var defaultdata={hasdetail:true,candelete:true};
         
         $stateProvider.state(state.name,{
                     url:state.url,
@@ -387,6 +389,7 @@ angular.module('ngErp')
     
     this.save = function(item){
         console.dir('saving '+ this.modelName);
+        console.dir(item);
         var d=$q.defer();
         item.$save(
             function(item){ d.resolve(item);},

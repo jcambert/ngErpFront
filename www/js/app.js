@@ -9,11 +9,19 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
 .constant('StandardStates',[
     {name:'dp',data:{hasdetail:true}},
     {name:'matiere',data:{hasdetail:false,candelete:false}},
-    {name:'chiffragenuancematiere',data:{title:'Nuance Matiere'}}])
+    {name:'chiffragenuancematiere',data:{hasdetail:false,listTitle:'Nuance Matiere'}},
+    {name:'chiffragemodeloperation',data:{hasdetail:false,listTitle:'Model d\'operation'}},
+    {name:'client',data:{titles:{list:'Gestion des clients',add:'un client',edit:'le client',fields:['nom']},hasdetail:false}},
+    {name:'contact',data:{titles:{list:'Gestion des contacts',add:'un contact',edit:'le contact',fields:['civilite','nom','prenom']},hasdetail:false}}
+])
 .constant('SubmenusStates',[
     {name:'deviseur',data:{title:'Gestion deviseur'}},
     {name:'commercial',data:{title:'Gestion commerciale'}}
 ])
+.constant('FormMode',{
+    add:'Ajouter',
+    edit:'Editer'
+})
 .config(['$stateProvider','$urlRouterProvider','toastrConfig','ionicDatePickerProvider','erpStateProvider',function($stateProvider,$urlRouterProvider,toastrConfig,ionicDatePickerProvider,erpStateProvider){
     console.dir('config application');
     
@@ -273,9 +281,11 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
         });
 }])
 
-.controller('ListController',['Paths','$injector','$scope','$state','$stateParams','$ionicModal','toastr','modelName',function(paths,$injector,$scope,$state,$stateParams,$ionicModal,toastr,modelName){
+.controller('ListController',['$ionicHistory','Paths','$injector','$scope','$state','$stateParams','$ionicModal','toastr','modelName',function($ionicHistory,paths,$injector,$scope,$state,$stateParams,$ionicModal,toastr,modelName){
     
     $scope.state=$state;
+    $scope.title=$scope.state.current.data.titles.list;
+    $ionicHistory.currentTitle($scope.title);
     var menuService= $injector.get('MenuService');
     
     var dataService= $injector.get('DataService');//var dataService=$injector.get( modelName+'Service');
@@ -285,12 +295,14 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
         $scope.wrapper = $injector.get(modelName+'Service');
     }
     
-     $ionicModal.fromTemplateUrl(paths.template+modelName+'/add.html', {
+    /* $ionicModal.fromTemplateUrl(paths.template+modelName+'/add.html', {
         scope: $scope,
         animation: 'slide-in-up'
     }).then(function(modal) {
         $scope.modal = modal;
-    });
+    });*/
+    
+
     
     $scope.addItem = function(){
         dataService.create().then(function(item){
@@ -330,8 +342,9 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
     reload();
 }])
 
-.controller('EditController',['Paths','$injector','$scope','$state','$stateParams','$ionicModal','toastr','ionicDatePicker','modelName','moment',function(paths,$injector,$scope,$state,$stateParams,$ionicModal,toastr,ionicDatePicker,modelName,moment){
+.controller('FormController',['$ionicHistory','$log', 'FormMode','Paths','$injector','$scope','$state','$stateParams','$ionicModal','toastr','ionicDatePicker','modelName','moment',function($ionicHistory,$log,mode,paths,$injector,$scope,$state,$stateParams,$ionicModal,toastr,ionicDatePicker,modelName,moment){
     $scope.state = $state;
+    $scope.title = 'title';
     var dataService= $injector.get('DataService');//$injector.get( modelName+'Service');
     dataService.init(modelName);
     
@@ -341,6 +354,8 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
     
     dataService.get($stateParams.id).then(function(item){
         $scope.item=item;
+        setTitle();
+        $ionicHistory.currentTitle($scope.title);
     });
     
     $scope.pickdate = function(field){
@@ -355,17 +370,100 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
         ionicDatePicker.openDatePicker(ipObj1);
     };
     
-    $scope.saveItem = function(){
-        dataService.save($scope.item).then(function(item){
-            $scope.item=item;
-            toastr.success('Enregistré avec succès');
-            $state.go('home.'+modelName);
-        });
+    function setTitle(){
+        $log.log('setTitle()');
+        $scope.title=getTitle();
     }
+    function getTitle(){
+        var result=mode[$scope.state.current.data.mode]+' '+$scope.state.current.data.titles[$scope.state.current.data.mode];
+        if($scope.state.current.data.mode=='edit' && $scope.state.current.data.titles.fields){
+            result=result+' '+ $scope.state.current.data.titles.fields.map(function(item){return $scope.item[item]}).join(' ');
+        }
+        return result;
+   }
     
     $scope.goBack = function(){
-        $state.go('home.'+modelName);
+        $state.historyBack();//goBack();
     }
+    
+    $scope.canGoBack = function(){
+        return $state.canGoBack();
+    }
+    
+    $scope.addItem = function(collection,model){
+         var subserv=$injector.get('DataService');
+        subserv.init(model);
+        
+        $scope.currentItem= {};
+        $scope.currentItem.collection=collection;
+        $scope.currentItem.model = model;
+        $scope.currentItem.index = -1;
+        $scope.currentItem.item = subserv.create();
+        editItem();
+    }
+    
+    $scope.editItem = function(collection,model,index){
+        $scope.currentItem= {};
+        $scope.currentItem.collection=collection;
+        $scope.currentItem.model = model;
+        $scope.currentItem.index =index;
+        $scope.currentItem.item = angular.copy($scope.item[collection][index] );
+        
+        editItem();
+    };
+    
+    function editItem(){
+        var form=paths.template+$scope.currentItem.model+'/edit.html';
+        $state.go('home.'+$scope.currentItem.model+'-edit',{id:$scope.currentItem.item.id});
+        /*var tpl='<ion-modal-view><ng-include="'+form+'"></ng-include></ion-modal-view>';
+        $scope.modal=$ionicModal.fromTemplate(tpl,{scope:$scope,animation:'slide-in-up'});
+        $scope.modal.show();*/
+        /*$ionicModal.fromTemplateUrl(paths.template+modelName+'/'+$scope.currentItem.model+'.html', {
+            scope: $scope,
+            animation: 'slide-in-up'
+        }).then(function(modal) {
+            $scope.modal = modal;
+            modal.show();
+        });*/
+    }
+
+    
+    $scope.saveItem = function(){
+        if(angular.isDefined($scope.modal)){
+            if(angular.isDefined($scope.currentItem.item) && angular.isDefined($scope.currentItem.item.id))
+                $scope.item[$scope.currentItem.collection][$scope.currentItem.index]=$scope.currentItem.item;
+            else
+                $scope.item[$scope.currentItem.collection].push($scope.currentItem.item);
+            $scope.modal.hide();
+        }else{
+            console.dir('item save');
+            dataService.save($scope.item).then(function(item){
+                $scope.item=item;
+                toastr.success('Enregistré avec succès');
+                //$state.go('home.'+modelName);
+                $state.historyBack();//goBack();
+            });
+        }
+        
+    }
+    
+     // Cleanup the modal when we're done with it!
+    $scope.$on('$destroy', function() {
+        //$scope.modal.remove();
+        $scope.currentItem ={};
+    });
+    // Execute action on hide modal
+    $scope.$on('modal.hidden', function() {
+        // Execute action
+        //$scope.currentItem ={};
+        delete $scope.modal;
+    });
+    // Execute action on remove modal
+    $scope.$on('modal.removed', function() {
+        // Execute action
+        
+    });
+    
 }])
 
 .controller('DetailController',['Paths','$injector','$scope','$state','$stateParams','$ionicModal','toastr','ionicDatePicker','modelName',function(paths,$injector,$scope,$state,$stateParams,$ionicModal,toastr,ionicDatePicker,modelName){

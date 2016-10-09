@@ -1,0 +1,11 @@
+<ion-view cache-view="false" >
+    <ion-nav-title> {{ title }} </ion-nav-title>
+    <erp-view-list>
+        <erp-view-list-content item="$parent.item">
+                <h4>{{item.civilite}} {{item.nom}} {{item.prenom}} </h4> 
+                <p ng-if="item.telephone">Tel:{{item.telephone}}</p>
+                <p ng-if="item.email">Tel:{{item.email}}</p> 
+          
+        </erp-view-list-content>
+    </erp-view-list>
+</ion-view>

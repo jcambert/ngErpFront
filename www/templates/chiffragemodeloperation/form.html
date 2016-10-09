@@ -1,0 +1,36 @@
+
+<ion-modal-view>
+    <ion-header-bar class="bar bar-header bar-positive">
+        <h1 class="title">{{currentItem.id?'Editer':'Ajouter'}}</h1>
+        <button class="button button-clear button-primary" ng-click="modal.hide()">Annuler</button>
+    </ion-header-bar>
+    <ion-content class="padding">
+        <div class="list">
+            <label class="item item-input  item-floating-label">
+                <span class="input-label">Nom</span>
+                <input placeholder="Nom" ng-model="currentItem.nom" type="text" required>
+            </label>
+            <label class="item item-input  item-floating-label">
+                <span class="input-label">Taux Horraire Preparation</span>
+                <input placeholder="Taux Horraire Preparation" ng-model="currentItem.thprep" type="number" required>
+            </label>
+            <label class="item item-input  item-floating-label">
+                <span class="input-label">Taux Horraire Operation</span>
+                <input placeholder="Taux Horraire Operation" ng-model="currentItem.thope" type="number" required>
+            </label>
+            <label class="item item-input  item-floating-label">
+                <span class="input-label">Temps Preparation Standard</span>
+                <input placeholder="Temps Preparation Standard" ng-model="currentItem.tpsprep" type="number" required>
+            </label>
+            <label class="item item-input  item-floating-label">
+                <span class="input-label">Aide</span>
+                <input placeholder="Aide" ng-model="currentItem.help" type="text" required>
+            </label>
+             <label class="item item-input  item-floating-label">
+                <span class="input-label">Temps Base Operation</span>
+                <input placeholder="Temps Base Operation" ng-model="currentItem.baseope" type="number" required>
+            </label>
+            <button class="button button-full button-positive" ng-click="saveItem()">Sauver</button>
+        </div>
+    </ion-content>
+</ion-modal-view>
