@@ -5,11 +5,10 @@
         <ion-list>
             
             <ion-item class="item item-divider">
-                Edition du client {{item.nom}}
-                 <a  href="#" ng-click="saveItem()" ng-if="canSave()" class="pull-right">
+                 <a  href="#" ng-click="saveItem()" class="pull-right">
                     <i class="ion-android-send size-24"></i>
                 </a>
-                 <a  href="#" ng-click="goBack()" ng-if="canGoBack()" class="pull-right">
+                 <a  href="#" ng-click="goBack()"  ng-if="canGoBack()" class="pull-right">
                     <i class="ion-ios-arrow-back size-24"></i>
                 </a>
              </ion-item>
@@ -21,7 +20,7 @@
                     
              </ion-item>
              <ion-item class="item item-divider">
-               <a  href="#" ng-click="addItem('contacts','contact')">
+               <a  ng-click="addItem('contacts','contact')">
                     <i class="ion-plus size-24"></i>
                 </a>
              </ion-item>

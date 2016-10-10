@@ -1,23 +1,26 @@
 
-<ion-view cache-view="false" >
+<ion-view cache-view="false" ng-init="clients=wrapper.allClient()">
     <ion-nav-title> {{ title }} </ion-nav-title>
-    <ion-header-bar class="bar bar-header bar-positive">
-        <h1 class="title">{{currentItem.item.id?'Editer':'Ajouter'}}</h1>
-        <button class="button button-clear button-primary" ng-click="modal.hide()">Annuler</button>
-    </ion-header-bar>
     <ion-content>
         <ion-list>
             
             <ion-item class="item item-divider">
-                Edition du contact {{item.nom}} {{item.prenom}}
                  <a  href="#" ng-click="saveItem()" class="pull-right">
                     <i class="ion-android-send size-24"></i>
                 </a>
-                 <a  href="#" ng-click="goBack()"  class="pull-right">
+                 <a  href="#" ng-click="goBack()"  ng-if="canGoBack()" class="pull-right">
                     <i class="ion-ios-arrow-back size-24"></i>
                 </a>
              </ion-item>
              <ion-item>
+                 <label class="item item-input item-select">
+                    <div class="input-label">Civilite</div>
+                    <select ng-model="item.civilite">
+                        <option value="Mr">Monsieur</option>
+                        <option value="Mme">Madame</option>
+                        <option value="Mle">Mademoiselle</option>
+                    </select>
+                </label>
                    <label class="item item-input-inset">
                         <span class="input-label">Nom</span>
                         <input type="text" placeholder="Nom" ng-model="item.nom" camel-case>
@@ -30,23 +33,14 @@
                     <span class="input-label">Telephone</span>
                     <input type="text" placeholder="Telephone" ng-model="item.telephone">
                 </label>
-                    
+                <label class="item item-input item-select" >
+                    <div class="input-label">Client</div>
+                    <select ng-model="item.client" ng-options="client as client.nom for client in clients track by client.id">
+                        
+                    </select>
+                </label>    
              </ion-item>
-             <ion-item class="item item-divider">
-               <a  href="#" ng-click="addItem('contacts','contact')">
-                    <i class="ion-plus size-24"></i>
-                </a>
-             </ion-item>
-             <ion-item>
-                  <ion-list  show-delete="false" can-swipe="true" >  
-                    <ion-item  ng-repeat="contact in item.contacts" ng-click="editItem('contacts','contact',$index)">
-                        <h4>{{contact.civilite}} {{contact.nom}} {{contact.prenom}}</h4>
-                        <p>{{contact.email}}</p>
-                        <!--<ion-option-button class="button-light icon ion-heart"></ion-option-button>-->
-                        <ion-option-button class="button-assertive icon ion-trash-a" ng-click="menu.items.splice($index, 1)"></ion-option-button>
-                    </ion-item>
-                </ion-list>
-             </ion-item>
+             
              
         </ion-list>
         

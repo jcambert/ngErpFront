@@ -1,17 +1,27 @@
-<ion-view view-title="{{state.current.data.title}}" >
+<ion-view cache-view="false" ng-init="clients=wrapper.allClient();">
+     <ion-nav-title> {{ title }} </ion-nav-title>
     <ion-content>
         <ion-list can-swipe="true">
-              
             <ion-item class="item item-divider">
-                 <a  href="#" ng-click="saveItem()">
+                <a ng-if="!canGoBack()" ng-click="goToList()" class="pull-left">
+                    <i class="icon ion-ios-arrow-back size-24"></i>
+                </a>
+                 <a  ng-click="saveItem()" class="pull-right">
                     <i class="ion-android-send size-24"></i>
+                </a>
+                 <a   ng-click="goBack()"  ng-if="canGoBack()" class="pull-left">
+                    <i class="ion-ios-arrow-back size-24"></i>
                 </a>
              </ion-item>
             <ion-item  >
                <label class="item item-input item-floating-label">
                     <span class="input-label">Numero</span>
-                    <input type="number" ng-model="item.numero" type="text" ng-disabled="true" required>
+                    <input type="number" ng-model="item.numero" type="text" ng-disabled="editMode()" required>
                 </label>
+                <label class="item item-input item-select" >
+                    <div class="input-label">Client</div>
+                    <select ng-model="item.client" ng-options="client as client.nom for client in clients track by client.id"></select>
+                </label> 
                 <label class="item item-input item-floating-label">
                     <span class="input-label">Reference Client</span>
                     <input type="text" ng-model="item.referenceclient"  placeholder="Reference Client" required>
@@ -20,7 +30,10 @@
                     <span class="input-label">Date à rendre prévue</span>
                     <input type="text" placeholder="Date à rendre prévue" ng-pattern='/^(0?[1-9]|[12][0-9]|3[01])\/(0?[1-9]|1[012])\/(19\d\d|20[12]\d)$/' ng-model="item.datearendreprevue"   required ng-dblclick="pickdate('datearendreprevue')">
                 </label>
-                
+                <label class="item item-input item-floating-label">
+                    <span class="input-label">Avenant</span>
+                    <input type="text" placeholder="Avenant" ng-pattern='/^[0-9]{1,7}$/' ng-model="item.version"   required >
+                </label>
             </ion-item>
             
         </ion-list>

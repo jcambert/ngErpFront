@@ -9841,6 +9841,10 @@ i.size-96 {
   float: right;
   padding: 8px; }
 
+.pull-left {
+  float: left;
+  padding: 8px; }
+
 .card-container {
   display: flex;
   align-items: center;

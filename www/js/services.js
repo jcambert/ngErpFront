@@ -24,21 +24,27 @@ angular.module('ngErp')
     }
     
     self.addStandardState= function(state,data){
+        console.log(state);
+        console.dir(data);
+        var defaultdata={hasdetail:false,candelete:true,canedit:true,cancopy:false,toro:true};
+        data=angular.extend({},defaultdata,data);
+        console.dir(data);
         this.addState({model:state, name:'home.'+state, url:'/'+state,templateUrl:state+'/list.html',controller:'ListController',title:'Liste des '+state,dataService:state+'Service'},data);
-        this.addState({model:state, name:'home.'+state+'-add',  url:'/'+state+'add',     templateUrl:state+'/form.html',controller:'FormController',title:'Gestion '+state,dataService:state+'Service'},angular.extend(data,{mode:'add'}));
-        this.addState({model:state, name:'home.'+state+'-edit', url:'/'+state+'edit/:id',templateUrl:state+'/form.html',controller:'FormController',title:'Gestion '+state,dataService:state+'Service'},angular.extend(data,{mode:'edit'}));
-        if(!angular.isDefined(data.hasdetail) || data.hasdetail)
-            this.addState({model:state, name:'home.'+state+'-detail', url:'/'+state+'detail/:id',templateUrl:state+'/detail.html',controller:'DetailController',title:'Détail '+state,dataService:state+'Service'},data);
+        
+        this.addState({model:state, name:'home.'+state+'-edit', url:'/'+state+'-edit/:id',templateUrl:state+'/form.html',controller:'FormController',title:'Gestion '+state,dataService:state+'Service'},angular.extend({},data,{mode:'edit'}));
+        this.addState({model:state, name:'home.'+state+'-add',  url:'/'+state+'-add?parent&id', templateUrl:state+'/form.html',controller:'FormController',title:'Gestion '+state,dataService:state+'Service'},angular.extend({},data,{mode:'add'}));
+        if(data.hasdetail)
+            this.addState({model:state, name:'home.'+state+'-detail', url:'/'+state+'-detail/:id',templateUrl:state+'/detail.html',controller:'DetailController',title:'Détail '+state,dataService:state+'Service'},data);
     }
     self.addState = function(state,data){
-        var defaultdata={hasdetail:true,candelete:true};
+        
         
         $stateProvider.state(state.name,{
                     url:state.url,
                     cache: false,
                     templateUrl:Paths.template+state.templateUrl,
                     controller:state.controller,
-                    data:angular.extend(defaultdata,data),
+                    data:data,
                     resolve:{
                         //dataService:function(){return state.dataService;},
                         modelName:function() {return state.model;}
@@ -204,166 +210,30 @@ angular.module('ngErp')
         return d.promise;
     }
 }])
-/*
-.service('dpService',['sailsResource','toastr','$log','$q',function(sailsResource,toastr,$log,$q){
-    var DP = sailsResource('dp',{
-        
-    });
-    
-    this.all = function(){
-        var d=$q.defer();
-        DP.query(
-            function(items){d.resolve(items);},
-            function(err){
-                $log.log(err);
-                toastr.error('Impossible de recuperer les offres de prix');
-                d.reject(err);
-            }
-        )
-        return d.promise;
-    };
-    
-    this.create = function(){
-        return $q(function(resolve, reject) {
-            resolve(new DP());
-        });
-    };
-    
-    this.save = function(item){
-        var d=$q.defer();
-        //var cmd=angular.isDefined(item.id)?item.$save:item.$update;
-        item.$save(
-            function(item){ d.resolve(item);},
-            function(err){
-                $log.log(err);
-                toastr.error('Impossible de sauver l\'offre de prix N°:'+item.numero);
-                d.reject(err);
-            }
-        );
-        return d.promise;
-    }
-    
-    this.getById = function(id){
-        var d=$q.defer();
-        DP.get({id:id},
-            function(item){d.resolve(item);},
-            function(err){
-                 $log.log(err);
-                toastr.error('Impossible de recuperer l\'offre de prix id:'+id);
-                d.reject(err);
-            });
-        return d.promise;
-    }
-}])
-
-.service('matiereService',['sailsResource','toastr','$log','$q',function(sailsResource,toastr,$log,$q){
-    var ITEM = sailsResource('matiere',{
-        
-    });
-    
-    this.all = function(){
-        var d=$q.defer();
-        ITEM.query({sort:{'nom':1}},
-            function(items){d.resolve(items);},
-            function(err){
-                $log.log(err);
-                toastr.error('Impossible de recuperer les matieres');
-                d.reject(err);
-            }
-        )
-        return d.promise;
-    };
-    
-    this.create = function(){
-        return $q(function(resolve, reject) {
-            resolve(new ITEM());
-        });
-    };
-    
-    this.save = function(item){
-        var d=$q.defer();
-        item.$save(
-            function(item){ d.resolve(item);},
-            function(err){
-                $log.log(err);
-                toastr.error('Impossible de sauver l\'offre de prix N°:'+item.numero);
-                d.reject(err);
-            }
-        );
-        return d.promise;
-    }
-    
-    this.getById = function(id){
-        var d=$q.defer();
-        ITEM.get({id:id},
-            function(item){d.resolve(item);},
-            function(err){
-                 $log.log(err);
-                toastr.error('Impossible de recuperer l\'offre de prix id:'+id);
-                d.reject(err);
-            });
-        return d.promise;
-    }
-}])
 
 
-.service('nuancematiereService',['sailsResource','toastr','$log','$q',function(sailsResource,toastr,$log,$q){
-    var ITEM = sailsResource('nuancematiere',{
-        
-    });
-    
-    this.all = function(){
-        var d=$q.defer();
-        ITEM.query(
-            function(items){d.resolve(items);},
-            function(err){
-                $log.log(err);
-                toastr.error('Impossible de recuperer les matieres');
-                d.reject(err);
-            }
-        )
-        return d.promise;
-    };
-    
-    this.create = function(){
-        return $q(function(resolve, reject) {
-            resolve(new ITEM());
-        });
-    };
-    
-    this.save = function(item){
-        var d=$q.defer();
-        item.$save(
-            function(item){ d.resolve(item);},
-            function(err){
-                $log.log(err);
-                toastr.error('Impossible de sauver l\'offre de prix N°:'+item.numero);
-                d.reject(err);
-            }
-        );
-        return d.promise;
-    }
-    
-    this.getById = function(id){
-        var d=$q.defer();
-        ITEM.get({id:id},
-            function(item){d.resolve(item);},
-            function(err){
-                 $log.log(err);
-                toastr.error('Impossible de recuperer l\'offre de prix id:'+id);
-                d.reject(err);
-            });
-        return d.promise;
-    }
-}])*/
-
-.factory('DataService',['sailsResource','toastr','$log','$q',function(sailsResource,toastr,$log,$q){
+.factory('DataService',['sailsResource','toastr','$log','$q','$rootScope','$injector',function(sailsResource,toastr,$log,$q,$rootScope,$injector){
     var ITEM = null;
+    var wrapper = null;
+    var self=this;
     this.modelName='';
+    
+    
+    
     this.init = function(modelName,options){
         ITEM=sailsResource(modelName,options || {});
         this.modelName = modelName;
+        if(  $injector.has(modelName+'Service')){
+            wrapper = $injector.get(modelName+'Service');
+        }
     }
+    
+    function callWrapper(method,args){
+        if(!angular.isDefined(wrapper))return null;
+        if(angular.isFunction(wrapper[method]))
+            return wrapper[method](args);
+    }
+    
     this.all = function(options){
         var toptions={}
        
@@ -400,20 +270,63 @@ angular.module('ngErp')
             }
         );
         return d.promise;
-    }
+    };
     
     this.get = function(id){
         var d=$q.defer();
         ITEM.get({id:id},
             function(item){d.resolve(item);},
             function(err){
-                 $log.log(err);
+                $log.log(err);
                 toastr.error('Impossible de recuperer l\'offre de prix id:'+id);
                 d.reject(err);
             });
         return d.promise;
-    }
+    };
     
+    this.delete = function(item){
+        var d=$q.defer();
+        item.$delete(
+            function(){d.resolve();},
+            function(err){
+                $log.log(err);
+                toastr.error('Impossible de recuperer l\'offre de prix id:');
+                d.reject(err);
+            });
+        return d.promise;
+    };
+    
+    this.copy = function(id,save){
+        var d=$q.defer();
+        this.get(id).then(
+            function(item){
+                delete item.id;
+                delete item.createdAt;
+                delete item.updatedAt;
+                item=callWrapper('copy',item);
+                console.dir(item.version);
+                if(save)
+                    self.save(item).then(
+                        function(item){
+                            d.resolve(item);
+                        },
+                        function(err){
+                            $log.log(err);
+                            toastr.error('Impossible de recuperer l\'offre de prix id:'+id);
+                            d.reject(err);
+                    });
+                else
+                    d.resolve(item);
+                
+            },
+            function(err){
+                $log.log(err);
+                toastr.error('Impossible de recuperer l\'offre de prix id:'+id);
+                d.reject(err);
+            }
+        );
+        return d.promise;
+    }
     
     return{
         init:this.init,
@@ -421,7 +334,10 @@ angular.module('ngErp')
         create:this.create,
         save:this.save,
         get:this.get,
-        resource:function(){return ITEM;}
+        delete:this.delete,
+        copy:this.copy,
+        resource:function(){return ITEM;},
+        wrapper:function(){return wrapper;}
         
     }
 }])
@@ -438,5 +354,37 @@ angular.module('ngErp')
     }
   
    
+}])
+
+.service('contactService',['sailsResource','toastr','$log','$q',function(sailsResource,toastr,$log,$q){
+    var Client = sailsResource('client',{});
+    
+
+    this.allClient = function(){
+        console.dir('query allClient()');
+        return Client.query({sort:{nom:1}});
+    }
+}])
+
+.service('dpService',['sailsResource','toastr','$log','$q','$rootScope',function(sailsResource,toastr,$log,$q,$rootScope){
+    var Client = sailsResource('client',{});
+    var scope = $rootScope.$new();
+    scope.$on('dataService.copyItem',function(event,args){
+        console.dir(args.item);
+    })
+    
+
+    this.allClient = function(){
+        console.dir('query allClient()');
+        return Client.query({sort:{nom:1}});
+    };
+    
+    this.copy = function(item){
+        console.dir('dpService Wrapper.copy');
+        console.dir(item.version);
+        item.version=item.version+1;
+        console.dir(item.version);
+        return item;
+    }
 }])
 ;

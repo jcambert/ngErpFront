@@ -1,5 +1,6 @@
-<ion-view view-title="{{state.current.data.title}}" >
+<ion-view cache-view="false" >
+    <ion-nav-title> {{ title }} </ion-nav-title>
     <erp-view-list>
-        <erp-view-list-content item="$parent.item" ><i class="icon ion-edit size-24"></i> {{item.id}}  {{item.numero}}</erp-view-list-content>
+        <erp-view-list-content item="$parent.item" > {{item.numero}}</erp-view-list-content>
     </erp-view-list>
 </ion-view>

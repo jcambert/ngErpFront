@@ -1,12 +1,12 @@
-<ion-view view-title="{{state.current.data.title}}" ng-init="matieres=wrapper.allMatiere()">
+<ion-view cache-view="false" ng-init="matieres=wrapper.allMatiere()">
+    <ion-nav-title> {{ title }} </ion-nav-title>
     <ion-content >
         <ion-list>
             <ion-item class="item item-divider">
-                 <a  href="#" ng-click="saveItem()">
+                 <a  href="#" ng-click="saveItem()" class="pull-right">
                     <i class="ion-android-send size-24"></i>
                 </a>
-                &nbsp;
-                 <a  href="#" ng-click="goBack()">
+                 <a  href="#" ng-click="goBack()"  ng-if="canGoBack()" class="pull-right">
                     <i class="ion-ios-arrow-back size-24"></i>
                 </a>
              </ion-item>

@@ -1,36 +1,43 @@
 
-<ion-modal-view>
-    <ion-header-bar class="bar bar-header bar-positive">
-        <h1 class="title">{{currentItem.id?'Editer':'Ajouter'}}</h1>
-        <button class="button button-clear button-primary" ng-click="modal.hide()">Annuler</button>
-    </ion-header-bar>
+<ion-view cache-view="false">
+    <ion-nav-title> {{ title }} </ion-nav-title>
     <ion-content class="padding">
-        <div class="list">
+        <ion-list>
+            <ion-item class="item item-divider">
+                <a ng-if="!canGoBack()" ng-click="goToList()" class="pull-left">
+                    <i class="icon ion-ios-arrow-back size-24"></i>
+                </a>
+                 <a  ng-click="saveItem()" class="pull-right">
+                    <i class="ion-android-send size-24"></i>
+                </a>
+                 <a   ng-click="goBack()"  ng-if="canGoBack()" class="pull-left">
+                    <i class="ion-ios-arrow-back size-24"></i>
+                </a>
+             </ion-item>
             <label class="item item-input  item-floating-label">
                 <span class="input-label">Nom</span>
-                <input placeholder="Nom" ng-model="currentItem.nom" type="text" required>
+                <input placeholder="Nom" ng-model="item.nom" type="text" required>
             </label>
             <label class="item item-input  item-floating-label">
                 <span class="input-label">Taux Horraire Preparation</span>
-                <input placeholder="Taux Horraire Preparation" ng-model="currentItem.thprep" type="number" required>
+                <input placeholder="Taux Horraire Preparation" ng-model="item.thprep" type="number" required>
             </label>
             <label class="item item-input  item-floating-label">
                 <span class="input-label">Taux Horraire Operation</span>
-                <input placeholder="Taux Horraire Operation" ng-model="currentItem.thope" type="number" required>
+                <input placeholder="Taux Horraire Operation" ng-model="item.thope" type="number" required>
             </label>
             <label class="item item-input  item-floating-label">
                 <span class="input-label">Temps Preparation Standard</span>
-                <input placeholder="Temps Preparation Standard" ng-model="currentItem.tpsprep" type="number" required>
+                <input placeholder="Temps Preparation Standard" ng-model="item.tpsprep" type="number" required>
             </label>
             <label class="item item-input  item-floating-label">
                 <span class="input-label">Aide</span>
-                <input placeholder="Aide" ng-model="currentItem.help" type="text" required>
+                <input placeholder="Aide" ng-model="item.help" type="text" required>
             </label>
              <label class="item item-input  item-floating-label">
                 <span class="input-label">Temps Base Operation</span>
-                <input placeholder="Temps Base Operation" ng-model="currentItem.baseope" type="number" required>
+                <input placeholder="Temps Base Operation" ng-model="item.baseope" type="number" required>
             </label>
-            <button class="button button-full button-positive" ng-click="saveItem()">Sauver</button>
-        </div>
+        </ion-list>
     </ion-content>
-</ion-modal-view>
+</ion-view>
