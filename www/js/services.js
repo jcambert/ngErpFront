@@ -383,6 +383,7 @@ angular.module('ngErp')
         console.dir('dpService Wrapper.copy');
         console.dir(item.version);
         item.version=item.version+1;
+        item.solde = true;
         console.dir(item.version);
         return item;
     }
