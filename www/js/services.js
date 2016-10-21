@@ -26,7 +26,7 @@ angular.module('ngErp')
     self.addStandardState= function(state,data){
         console.log(state);
         console.dir(data);
-        var defaultdata={hasdetail:false,candelete:true,canedit:true,cancopy:false,toro:true};
+        var defaultdata={hasdetail:false,candelete:true,canedit:true,cancopy:false};
         data=angular.extend({},defaultdata,data);
         console.dir(data);
         this.addState({model:state, name:'home.'+state, url:'/'+state,templateUrl:state+'/list.html',controller:'ListController',title:'Liste des '+state,dataService:state+'Service'},data);
@@ -47,7 +47,7 @@ angular.module('ngErp')
                     data:data,
                     resolve:{
                         //dataService:function(){return state.dataService;},
-                        modelName:function() {return state.model;}
+                        modelName:function() {return state.model;},
                     }
                 });
     }
@@ -221,7 +221,9 @@ angular.module('ngErp')
     
     
     this.init = function(modelName,options){
-        ITEM=sailsResource(modelName,options || {});
+        ITEM=sailsResource(modelName,options || {
+            copy:{method:'GET',url:'/'+ modelName+'/copy/:id',isArray:false}
+        });
         this.modelName = modelName;
         if(  $injector.has(modelName+'Service')){
             wrapper = $injector.get(modelName+'Service');
@@ -244,7 +246,7 @@ angular.module('ngErp')
             function(items){d.resolve(items);},
             function(err){
                 $log.log(err);
-                toastr.error('Impossible de recuperer les matieres');
+                toastr.error('Impossible de recuperer '+this.modelName );
                 d.reject(err);
             }
         )
@@ -265,7 +267,7 @@ angular.module('ngErp')
             function(item){ d.resolve(item);},
             function(err){
                 $log.log(err);
-                toastr.error('Impossible de sauver l\'offre de prix N°:'+item.numero);
+                toastr.error('Impossible de recuperer '+this.modelName +'with id:'+id);
                 d.reject(err);
             }
         );
@@ -278,7 +280,7 @@ angular.module('ngErp')
             function(item){d.resolve(item);},
             function(err){
                 $log.log(err);
-                toastr.error('Impossible de recuperer l\'offre de prix id:'+id);
+                toastr.error('Impossible de recuperer '+this.modelName +'with id:'+id);
                 d.reject(err);
             });
         return d.promise;
@@ -290,7 +292,7 @@ angular.module('ngErp')
             function(){d.resolve();},
             function(err){
                 $log.log(err);
-                toastr.error('Impossible de recuperer l\'offre de prix id:');
+                toastr.error('Impossible de recuperer '+this.modelName +'with id:'+id);
                 d.reject(err);
             });
         return d.promise;
@@ -298,33 +300,13 @@ angular.module('ngErp')
     
     this.copy = function(id,save){
         var d=$q.defer();
-        this.get(id).then(
-            function(item){
-                delete item.id;
-                delete item.createdAt;
-                delete item.updatedAt;
-                item=callWrapper('copy',item);
-                console.dir(item.version);
-                if(save)
-                    self.save(item).then(
-                        function(item){
-                            d.resolve(item);
-                        },
-                        function(err){
-                            $log.log(err);
-                            toastr.error('Impossible de recuperer l\'offre de prix id:'+id);
-                            d.reject(err);
-                    });
-                else
-                    d.resolve(item);
-                
-            },
+        ITEM.copy({id:id},
+            function(newItem){d.resolve(newItem);},
             function(err){
-                $log.log(err);
-                toastr.error('Impossible de recuperer l\'offre de prix id:'+id);
+                 $log.log(err);
+                toastr.error('Impossible de recuperer '+this.modelName +'with id:'+id);
                 d.reject(err);
-            }
-        );
+            });
         return d.promise;
     }
     
@@ -368,24 +350,14 @@ angular.module('ngErp')
 
 .service('dpService',['sailsResource','toastr','$log','$q','$rootScope',function(sailsResource,toastr,$log,$q,$rootScope){
     var Client = sailsResource('client',{});
-    var scope = $rootScope.$new();
-    scope.$on('dataService.copyItem',function(event,args){
-        console.dir(args.item);
-    })
     
+    var scope = $rootScope.$new();
 
     this.allClient = function(){
         console.dir('query allClient()');
         return Client.query({sort:{nom:1}});
     };
     
-    this.copy = function(item){
-        console.dir('dpService Wrapper.copy');
-        console.dir(item.version);
-        item.version=item.version+1;
-        item.solde = true;
-        console.dir(item.version);
-        return item;
-    }
+
 }])
 ;
