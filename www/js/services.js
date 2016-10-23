@@ -1,6 +1,10 @@
 angular.module('ngErp')
-.provider('erpState',['$stateProvider','Paths','$injector','StandardStates','SubmenusStates',function($stateProvider,Paths,$injector,StandardStates,SubmenusStates){
+.provider('erpState',['Messages', '$stateProvider','Paths','$injector','StandardStates','SubmenusStates',function(messages,$stateProvider,Paths,$injector,StandardStates,SubmenusStates){
     var self=this;
+    
+    
+        
+    
     self.registerStandardStates = function(){
         angular.forEach(StandardStates,function(state){
            self.addStandardState(state.name,state.data || {}); 
@@ -29,8 +33,7 @@ angular.module('ngErp')
         var defaultdata={hasdetail:false,candelete:true,canedit:true,cancopy:false};
         data=angular.extend({},defaultdata,data);
         console.dir(data);
-        this.addState({model:state, name:'home.'+state, url:'/'+state,templateUrl:state+'/list.html',controller:'ListController',title:'Liste des '+state,dataService:state+'Service'},data);
-        
+        this.addState({model:state, name:'home.'+state, url:'/'+state,templateUrl:state+'/list.html',controller:'ListController',title:'Liste des '+state,dataService:state+'Service'},angular.extend({},data,{mode:'list'}));
         this.addState({model:state, name:'home.'+state+'-edit', url:'/'+state+'-edit/:id',templateUrl:state+'/form.html',controller:'FormController',title:'Gestion '+state,dataService:state+'Service'},angular.extend({},data,{mode:'edit'}));
         this.addState({model:state, name:'home.'+state+'-add',  url:'/'+state+'-add?parent&id', templateUrl:state+'/form.html',controller:'FormController',title:'Gestion '+state,dataService:state+'Service'},angular.extend({},data,{mode:'add'}));
         if(data.hasdetail)
@@ -47,7 +50,10 @@ angular.module('ngErp')
                     data:data,
                     resolve:{
                         //dataService:function(){return state.dataService;},
-                        modelName:function() {return state.model;},
+                        modelName:function() {
+                            
+                            return state.model;
+                        },
                     }
                 });
     }

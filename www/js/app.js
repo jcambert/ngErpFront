@@ -7,7 +7,7 @@
 angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-datepicker','angularMoment'])
 .constant('Paths',{template:'templates/'})
 .constant('StandardStates',[
-    {name:'dp',data:{cancopy:true,toro:false,titles:{list:'Gestion des Offres de Prix',add:'une Offre de prix',edit:'l\'offre de prix {{item.numero}} version:{{item.version}} '}}},
+    {name:'dp',data:{cancopy:true,toro:false,titles:{list:'Gestion des Offres de Prix ( {{ items.length+1 }} )',add:'une Offre de prix',edit:'l\'offre de prix {{item.numero}} v{{item.version}} '}}},
     {name:'matiere',data:{titles:{list:'Gestion des matieres',add:'une matiere',edit:'la matiere',fields:['nom']}}},
     {name:'chiffragenuancematiere',data:{titles:{list:'Gestion des nuances matieres',add:'une nuance',edit:'la nuance',fields:['nom']}}},
     {name:'chiffragemodeloperation',data:{titles:{list:'Gestion des modele d\'operation',add:'une operation',edit:'l\'operation',fields:['nom']}}},
@@ -21,6 +21,13 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
 .constant('FormMode',{
     add:'Ajouter',
     edit:'Editer'
+})
+.constant('Messages',{
+    onModelChanged:'onModelChanged',
+    onSaveForm:'onSaveForm',
+    onCopyForm:'onCopyForm',
+    onDeleteForm:'onDeleteForm',
+    onPrintForm:'onPrintForm'
 })
 .config(['$stateProvider','$urlRouterProvider','toastrConfig','ionicDatePickerProvider','erpStateProvider',function($stateProvider,$urlRouterProvider,toastrConfig,ionicDatePickerProvider,erpStateProvider){
     console.dir('config application');
@@ -167,6 +174,61 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
         }
     }
 }])
+
+.controller('MainController',['$rootScope', '$scope','$state','Messages',function($rootScope,$scope,$state,messages){
+    
+    $rootScope.$on('$stateChangeStart', 
+        function(event, toState, toParams, fromState, fromParams, options){ 
+            console.dir('reset state');
+            delete $scope.modelName;
+            $scope.mode='list';
+            console.dir($scope.formMode());
+         });
+
+    
+    $rootScope.$on(messages.onModelChanged,function(event,args){
+        console.dir(args);
+        $scope.modelName=args.modelName;
+        $scope.mode=args.mode;
+    })
+    
+    $scope.formMode = function(){
+        return $scope.mode =='edit' || $scope.mode=='add';
+    }
+    
+    $scope.listMode = function(){
+        return $scope.mode == 'list';
+    }
+    $scope.saveForm = function(){
+        $rootScope.$broadcast(messages.onSaveForm);
+    }
+    
+    $scope.copyForm = function(){
+        $rootScope.$broadcast(messages.onCopyForm);
+    }
+    
+    $scope.deleteForm = function(){
+        $rootScope.$broadcast(messages.onDeleteForm);
+    }
+    
+    $scope.printForm = function(){
+        $rootScope.$broadcast(messages.onPrintForm);    
+    }
+    
+    $scope.goBack = function(){
+        $state.historyBack();//goBack();
+    }
+    
+    $scope.canGoBack = function(){
+        return $state.canGoBack();
+    }
+    
+    $scope.goToList = function(){
+        //alert($scope.modelName);
+        $state.go('home.'+$scope.modelName);
+    }
+    
+}])
 .controller('LeftMenuController',['$scope','MenuService', function($scope,MenuService){
     MenuService.getLeftMenu().then(function(menus){$scope.menus=menus;});
 }])
@@ -239,7 +301,7 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
 
 .controller('MenuEditController',['$scope','$state','$stateParams','MenuService','$ionicModal','toastr',function($scope,$state,$stateParams,MenuService,$ionicModal,toastr){
     $scope.state=$state;
-    $scope.menu={};
+    $scope.menu=undefined;
     MenuService.byId($stateParams.id).then(function(menu){$scope.menu=menu;console.dir(menu);})
     $ionicModal.fromTemplateUrl('templates/menus.items.edit.html', {
         scope: $scope,
@@ -284,9 +346,10 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
 .controller('ListController',['$ionicNavBarDelegate', '$ionicHistory','Paths','$injector','$scope','$state','$stateParams','$ionicModal','toastr','modelName',function($ionicNavBarDelegate, $ionicHistory,paths,$injector,$scope,$state,$stateParams,$ionicModal,toastr,modelName){
     
     $scope.state=$state;
-    $scope.title=$scope.state.current.data.titles.list;
-    $ionicNavBarDelegate.title($scope.title);
-    $ionicHistory.currentTitle($scope.title);
+    $scope.items=[];
+    //$scope.title=$scope.state.current.data.titles.list;
+    //$ionicNavBarDelegate.title($scope.title);
+    //$ionicHistory.currentTitle($scope.title);
     var menuService= $injector.get('MenuService');
     
     var dataService= $injector.get('DataService');//var dataService=$injector.get( modelName+'Service');
@@ -333,19 +396,35 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
     reload();
 }])
 
-.controller('FormController',['$ionicNavBarDelegate', '$rootScope', '$compile', '$ionicHistory','$log', 'FormMode','Paths','$injector','$scope','$state','$stateParams','$ionicModal','toastr','ionicDatePicker','modelName','moment',function($ionicNavBarDelegate,$rootScope, $compile,$ionicHistory,$log,mode,paths,$injector,$scope,$state,$stateParams,$ionicModal,toastr,ionicDatePicker,modelName,moment){
+.controller('FormController',['Messages', '$ionicNavBarDelegate', '$rootScope', '$compile', '$ionicHistory','$log', 'FormMode','Paths','$injector','$scope','$state','$stateParams','$ionicModal','toastr','ionicDatePicker','modelName','moment',function(messages,$ionicNavBarDelegate,$rootScope, $compile,$ionicHistory,$log,mode,paths,$injector,$scope,$state,$stateParams,$ionicModal,toastr,ionicDatePicker,modelName,moment){
     $scope.state = $state;
     $scope.title = 'title';
+    $scope.item = {};
     $scope.numberOfItemsToDisplay = 2;
     var dataService= $injector.get('DataService');//$injector.get( modelName+'Service');
     dataService.init(modelName);
     $scope.wrapper=dataService.wrapper();
     
+
+    $rootScope.$broadcast(messages.onModelChanged,{modelName:modelName,mode:$scope.state.current.data.mode});
    /* if(  $injector.has(modelName+'Service')){
         $scope.wrapper = $injector.get(modelName+'Service');
     }*/
-    console.dir('Mode:');
-    console.dir($state.current.data.mode);
+    $scope.$on(messages.onSaveForm,function(event,args){
+        alert('save');
+        //$scope.saveItem();
+    });
+    $scope.$on(messages.onCopyForm,function(event,args){
+        alert('copy');
+    });
+    $scope.$on(messages.onDeleteForm,function(event,args){
+        alert('delete');
+    });
+    $scope.$on(messages.onPrintForm,function(event,args){
+        alert('print');
+    });
+    
+    
     if($state.current.data.mode=='edit')
         dataService.get($stateParams.id).then(function(item){
             $scope.item=item;
@@ -390,13 +469,7 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
         return content.text();
    }
     
-    $scope.goBack = function(){
-        $state.historyBack();//goBack();
-    }
-    
-    $scope.canGoBack = function(){
-        return $state.canGoBack();
-    }
+
     
     $scope.addItem = function(collection,model){
          var subserv=$injector.get('DataService');
@@ -422,9 +495,7 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
         //editItem();
     };
     
-    $scope.goToList = function(){
-        $state.go('home.'+modelName);
-    }
+    
     
     function editItem(){
        // var form=paths.template+$scope.currentItem.model+'/edit.html';
@@ -518,26 +589,51 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
             realTitle:'@'
         },
         link:function($scope,$element,attrs,ctrl){
-            var elt= angular.element('<span></span>');;
+            
             $scope.realTitle = attrs.realTitle;
-            $scope.$watch('ngModel',function(){
-                if(!angular.isDefined($scope.ngModel))return;
-                $scope.item=$scope.ngModel;
+            if($scope.ngData.mode=='list'){
                 
-                var result=mode[$scope.ngData.mode]+' '+$scope.ngData.titles[$scope.ngData.mode];
-                if($scope.ngData.mode=='edit' && $scope.ngData.titles.fields){
-                    result=result+' '+$scope.ngData.titles.fields.map(function(item){return $scope.ngModel[item]}).join(' ');
-                }
-                elt.append(result);
-                $scope.realTitle=$compile(elt)($scope);
-                $timeout(function(){
-                    $ionicHistory.currentTitle($scope.realTitle.text());
-                    $ionicNavBarDelegate.title($scope.realTitle.text());
-                },100)
-               
-             
-                //$element.replaceWith($scope.realTitle);
-            });
+                $scope.$watch('ngModel',function(){
+                    if(!angular.isDefined($scope.ngModel) || (angular.isArray($scope.ngModel) && $scope.ngModel.length>0) )return;
+                    var elt= angular.element('<span></span>');
+                    console.dir('models has changed');
+                    $scope.items=$scope.ngModel;
+                    console.dir($scope.ngModel);
+                    var result=$scope.ngData.titles[$scope.ngData.mode];console.dir(result);
+                    elt.append(result);
+                    $scope.realTitle=$compile(elt)($scope);
+                    
+                    $timeout(function(){
+                        console.dir($scope.items);
+                        $ionicNavBarDelegate.title($scope.realTitle.text());
+                        $ionicHistory.currentTitle($scope.realTitle.text());
+                        
+                    },1000);
+                });
+            }else{
+            
+                $scope.$watch('ngModel',function(){
+                    
+                    if(!angular.isDefined($scope.ngModel))return;
+                    var elt= angular.element('<span></span>');
+                    $scope.item=$scope.ngModel;
+                    
+                    var result=mode[$scope.ngData.mode]+' '+$scope.ngData.titles[$scope.ngData.mode];
+                    if($scope.ngData.mode=='edit' && $scope.ngData.titles.fields){
+                        result=result+' '+$scope.ngData.titles.fields.map(function(item){return $scope.ngModel[item]}).join(' ');
+                    }
+                    elt.append(result);
+                    $scope.realTitle=$compile(elt)($scope);
+                    $timeout(function(){
+                        $ionicNavBarDelegate.title($scope.realTitle.text());
+                        $ionicHistory.currentTitle($scope.realTitle.text());
+                        
+                    },1000);
+                
+                
+                    //$element.replaceWith($scope.realTitle);
+                });
+            }
             
         }
     }
