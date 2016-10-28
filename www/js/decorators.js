@@ -66,6 +66,18 @@
                 });
             };
 
+
+            $state.has = function(name){
+                return _.findIndex($state.get(),function(state){
+                    return state.name == name;
+                }) != -1;
+            }
+            
+            $state.isAbstract = function(name){
+                 return _.findIndex($state.get(),function(state){
+                    return state.name == name && state.abstract;
+                }) != -1;
+            }
             return $state;
         }
 

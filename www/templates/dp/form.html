@@ -1,8 +1,13 @@
 <ion-view cache-view="false" ng-init="clients=wrapper.allClient();">
      <ion-nav-title  > </ion-nav-title>
      <ng-title ng-model="item" ng-data="state.current.data" ></ng-title>
+     
+        
     <ion-content>
-        <ion-list>
+        <div class="bar bar-header">
+            <h1 class="title">Header</h1>
+        </div>
+        
             <!--<ion-item class="item item-divider">
                 <a ng-if="!canGoBack()" ng-click="goToList()" class="pull-left">
                     <i class="icon ion-ios-arrow-back size-24"></i>
@@ -14,11 +19,9 @@
                     <i class="ion-ios-arrow-back size-24"></i>
                 </a>
              </ion-item>-->
-            <ion-item  ui-view='main'>
+            <ui-view name ='main'></ui-view>
               
-            </ion-item>
             
-        </ion-list>
        
     </ion-content>
     

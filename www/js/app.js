@@ -71,6 +71,31 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
         erpStateProvider.registerStandardStates();
         $urlRouterProvider.otherwise('/');
     
+        $stateProvider
+        .state('home.dp-edit.main',{
+            url:'/main',
+            data:{
+                mode:'edit'
+            },
+            views:{
+                'main':{
+                    templateUrl:'templates/dp/inner/main.html'   
+                }
+            }
+        })
+        .state('home.dp-edit.report',{
+            url:'/report',
+            data:{
+                mode:'edit'
+            },
+            views:{
+                'main':{
+                    templateUrl:'templates/dp/inner/report.html'   
+                }
+            }
+        })
+        ;
+    
         angular.extend(toastrConfig, {
 
             templates: {
@@ -150,13 +175,13 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
 
 .controller('MainController',['$rootScope', '$scope','$state','Messages',function($rootScope,$scope,$state,messages){
     
-    $rootScope.$on('$stateChangeStart', 
+    /*$rootScope.$on('$stateChangeStart', 
         function(event, toState, toParams, fromState, fromParams, options){ 
             console.dir('reset state');
             delete $scope.modelName;
             $scope.mode='list';
             console.dir($scope.formMode());
-         });
+         });*/
 
     
     $rootScope.$on(messages.onModelChanged,function(event,args){
@@ -229,7 +254,7 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
             }
         })
         .catch(function(err){
-            
+            console.dir(err);
         })
 }])
 
@@ -340,7 +365,10 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
     }
 
     $scope.editItem = function(id){
-        $state.go('home.'+modelName+'-edit',{id:id});
+        var name='home.'+modelName+'-edit'
+        if($state.has(name+'.main'))
+            name=name+'.main';
+        $state.go(name,{id:id});
     }
     
     $scope.copyItem = function(id){
@@ -379,6 +407,7 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
     dataService.init(modelName);
     $scope.wrapper=dataService.wrapper();
     
+    console.dir('*** NEW FORM CONTROLLER ****');
 
     $rootScope.$broadcast(messages.onModelChanged,{modelName:modelName,mode:$scope.state.current.data.mode});
    /* if(  $injector.has(modelName+'Service')){

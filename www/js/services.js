@@ -39,22 +39,32 @@ angular.module('ngErp')
             this.addState({model:state, name:'home.'+state+'-edit', url:'/'+state+'-edit/:id',templateUrl:state+'/form.html',controller:'FormController',title:'Gestion '+state,dataService:state+'Service'},angular.extend({},data,{mode:'edit'}));
         }else{
             this.addState({model:state, name:'home.'+state+'-edit', url:'/'+state+'-edit/:id',templateUrl:state+'/form.html',controller:'FormController',title:'Gestion '+state,dataService:state+'Service',abstract:true},angular.extend({},data,{mode:'edit'}));
-            _.forEach(data.views,function(view,key){
+            //this.addState({name:'home.'+state+'-edit.main',url:'/'+state+'-edit/:id/main',views:{name:'main',states:[{name:'main',templateUrl:Paths.template+state+'inner/main.html'}]}});
+           /* _.forEach(data.views,function(view,key){
                 _.forEach(view.states,function(nestedstate){
                     var optionsview={};
                     optionsview[view.name]={templateUrl:state+'/inner/'+nestedstate.templateUrl+'.html'}
                     console.dir({name:'home.'+state+'-edit.'+nestedstate.name,url:'/'+nestedstate.url,views:optionsview});
                     
-                   // this.addState({name:'home.'+state+'-edit.'+nestedstate.name,url:'/'+nestedstate.url,views:optionsview});    
+                    //this.addState({name:'home.'+state+'-edit.'+nestedstate.name,url:'/'+nestedstate.url,views:optionsview},{});    
+                   //this.addState({},{}); 
                 });
                 
-            });
+            });*/
         }
         this.addState({model:state, name:'home.'+state+'-add',  url:'/'+state+'-add?parent&id', templateUrl:state+'/form.html',controller:'FormController',title:'Gestion '+state,dataService:state+'Service'},angular.extend({},data,{mode:'add'}));
         if(data.hasdetail)
             this.addState({model:state, name:'home.'+state+'-detail', url:'/'+state+'-detail/:id',templateUrl:state+'/detail.html',controller:'DetailController',title:'Détail '+state,dataService:state+'Service'},data);
     }
+    
+    this.temp = function(state,data){
+        console.dir('****************** addState ************************');
+        
+         console.dir('------------------------------------------------');
+    }
+    
     self.addState = function(state,data){
+        //return this.temp(state,data);
         console.dir('****************** addState ************************');
         var options={
                     url:state.url,
@@ -65,7 +75,7 @@ angular.module('ngErp')
             angular.extend(options,{abstract:state.abstract});
         if('model' in state)
             angular.extend(options,{resolve:{modelName:function(){return state.model;}}});
-        if( angular.isDefined(data))
+        if( angular.isDefined(data) )
             angular.extend(options,{data:data});     
         if('templateUrl' in state)
             angular.extend(options,{templateUrl:Paths.template+state.templateUrl})
