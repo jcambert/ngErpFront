@@ -81,7 +81,8 @@
                 </ion-nav-buttons>
                 <ion-nav-buttons side="right" >
                     <button class="button icon ion-android-arrow-back" ng-show="formMode()"ng-if="!canGoBack()" ng-click="goToList()"></button>
-                    <button class="button icon ion-android-send" ng-show="formMode()"></button>
+                    <button class="button icon ion-android-send" ng-show="formMode() && canGoBack()" ng-click="saveForm(false)"></button>
+                    <button class="button icon ion-ios-download-outline" ng-show="formMode()" ng-click="saveForm(true)"></button>
                     <button class="button icon ion-ios-copy-outline" ng-show="formMode()"></button>
                     <button class="button icon ion-ios-trash-outline" ng-show="formMode()"></button>
                     <button class="button icon ion-ios-printer-outline" ng-show="formMode()"></button>
@@ -91,14 +92,7 @@
         </ion-side-menu-content>
         <ion-side-menu side="left" ng-controller="LeftMenuController">
             <ion-list >
-                <!--<ion-item  menu-close ui-sref="home.commercial">
-                    <i class="ion-ios-briefcase size-14"></i>
-                    Commercial
-                </ion-item>
-                <ion-item menu-close ui-sref="home.deviseur">
-                    <i class="ion-social-euro size-14"></i>
-                    Deviseur
-                </ion-item>-->
+                
                 <ion-item menu-close ui-sref="home.settings" ng-if="menus.length==0">
                     <i class="ion-gear-b size-14"></i>
                     Parametres

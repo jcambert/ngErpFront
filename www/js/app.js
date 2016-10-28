@@ -7,7 +7,7 @@
 angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-datepicker','angularMoment'])
 .constant('Paths',{template:'templates/'})
 .constant('StandardStates',[
-    {name:'dp',data:{cancopy:true,toro:false,titles:{list:'Gestion des Offres de Prix ( {{ items.length+1 }} )',add:'une Offre de prix',edit:'l\'offre de prix {{item.numero}} v{{item.version}} '}}},
+    {name:'dp',data:{cancopy:true,titles:{list:'Gestion des Offres de Prix ( {{ items.length+1 }} )',add:'une Offre de prix',edit:'l\'offre de prix {{item.numero}} v{{item.version}} '},views:[{name:'toto',states:[{name:'titi', url:'totourl',templateUrl:'templateurl'}]}]}},
     {name:'matiere',data:{titles:{list:'Gestion des matieres',add:'une matiere',edit:'la matiere',fields:['nom']}}},
     {name:'chiffragenuancematiere',data:{titles:{list:'Gestion des nuances matieres',add:'une nuance',edit:'la nuance',fields:['nom']}}},
     {name:'chiffragemodeloperation',data:{titles:{list:'Gestion des modele d\'operation',add:'une operation',edit:'l\'operation',fields:['nom']}}},
@@ -65,46 +65,19 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
                 title:'Edition de menu'
             }
         })
-        /*.state('home.commercial',{
-            url:'/commercial',
-            cache:false,
-            templateUrl:'templates/submenus.html',
-            controller:'SubmenuController',
-            resolve:{
-                menu:function(){return 'commercial';}
-            },
-            data:{
-                title:'Gestion Commerciale'
-            }
-            
-        })
-        .state('home.deviseur',{
-            url:'/deviseur',
-            cache:false,
-            templateUrl:'templates/submenus.html',
-            controller:'SubmenuController',
-            resolve:{
-                menu:function(){
-                    return 'deviseur';
-                }
-            },
-            data:{
-                title:'Gestion Quotation'
-            }
-            
-        })*/
+
        
         erpStateProvider.registerSubmenus(); 
         erpStateProvider.registerStandardStates();
         $urlRouterProvider.otherwise('/');
     
-     angular.extend(toastrConfig, {
+        angular.extend(toastrConfig, {
 
-        templates: {
-            toast: 'templates/toast/toast.html',
-            progressbar: 'templates/progressbar/progressbar.html'
-        }
-    });
+            templates: {
+                toast: 'templates/toast/toast.html',
+                progressbar: 'templates/progressbar/progressbar.html'
+            }
+        });
     var datePickerObj = {
       inputDate: new Date(),
       titleLabel: 'Choisissez une Date',
@@ -199,9 +172,10 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
     $scope.listMode = function(){
         return $scope.mode == 'list';
     }
-    $scope.saveForm = function(){
-        $rootScope.$broadcast(messages.onSaveForm);
+    $scope.saveForm = function(continueModify){
+        $rootScope.$broadcast(messages.onSaveForm,{continueModify:continueModify});
     }
+
     
     $scope.copyForm = function(){
         $rootScope.$broadcast(messages.onCopyForm);
@@ -411,8 +385,8 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
         $scope.wrapper = $injector.get(modelName+'Service');
     }*/
     $scope.$on(messages.onSaveForm,function(event,args){
-        alert('save');
-        //$scope.saveItem();
+        //alert('save');
+        $scope.saveItem(args);
     });
     $scope.$on(messages.onCopyForm,function(event,args){
         alert('copy');
@@ -513,7 +487,7 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
     }
     
     
-    $scope.saveItem = function(){
+    $scope.saveItem = function(args){
         if(angular.isDefined($scope.modal)){
             if(angular.isDefined($scope.currentItem.item) && angular.isDefined($scope.currentItem.item.id))
                 $scope.item[$scope.currentItem.collection][$scope.currentItem.index]=$scope.currentItem.item;
@@ -521,12 +495,16 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
                 $scope.item[$scope.currentItem.collection].push($scope.currentItem.item);
             $scope.modal.hide();
         }else{
+            if(! ('continueModify' in args))
+                args.continueModify=false;
+            
             console.dir('item save');
             dataService.save($scope.item).then(function(item){
                 $scope.item=item;
                 toastr.success('Enregistré avec succès');
                 //$state.go('home.'+modelName);
-                if($scope.canGoBack())
+               
+                if(!args.continueModify && $scope.canGoBack() )
                     $state.historyBack();//goBack();
             });
         }

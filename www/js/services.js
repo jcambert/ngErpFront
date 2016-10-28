@@ -34,28 +34,47 @@ angular.module('ngErp')
         data=angular.extend({},defaultdata,data);
         console.dir(data);
         this.addState({model:state, name:'home.'+state, url:'/'+state,templateUrl:state+'/list.html',controller:'ListController',title:'Liste des '+state,dataService:state+'Service'},angular.extend({},data,{mode:'list'}));
-        this.addState({model:state, name:'home.'+state+'-edit', url:'/'+state+'-edit/:id',templateUrl:state+'/form.html',controller:'FormController',title:'Gestion '+state,dataService:state+'Service'},angular.extend({},data,{mode:'edit'}));
+        
+        if(!('views' in data)){
+            this.addState({model:state, name:'home.'+state+'-edit', url:'/'+state+'-edit/:id',templateUrl:state+'/form.html',controller:'FormController',title:'Gestion '+state,dataService:state+'Service'},angular.extend({},data,{mode:'edit'}));
+        }else{
+            this.addState({model:state, name:'home.'+state+'-edit', url:'/'+state+'-edit/:id',templateUrl:state+'/form.html',controller:'FormController',title:'Gestion '+state,dataService:state+'Service',abstract:true},angular.extend({},data,{mode:'edit'}));
+            _.forEach(data.views,function(view,key){
+                _.forEach(view.states,function(nestedstate){
+                    var optionsview={};
+                    optionsview[view.name]={templateUrl:state+'/inner/'+nestedstate.templateUrl+'.html'}
+                    console.dir({name:'home.'+state+'-edit.'+nestedstate.name,url:'/'+nestedstate.url,views:optionsview});
+                    
+                   // this.addState({name:'home.'+state+'-edit.'+nestedstate.name,url:'/'+nestedstate.url,views:optionsview});    
+                });
+                
+            });
+        }
         this.addState({model:state, name:'home.'+state+'-add',  url:'/'+state+'-add?parent&id', templateUrl:state+'/form.html',controller:'FormController',title:'Gestion '+state,dataService:state+'Service'},angular.extend({},data,{mode:'add'}));
         if(data.hasdetail)
             this.addState({model:state, name:'home.'+state+'-detail', url:'/'+state+'-detail/:id',templateUrl:state+'/detail.html',controller:'DetailController',title:'Détail '+state,dataService:state+'Service'},data);
     }
     self.addState = function(state,data){
-        
-        
-        $stateProvider.state(state.name,{
+        console.dir('****************** addState ************************');
+        var options={
                     url:state.url,
-                    cache: false,
-                    templateUrl:Paths.template+state.templateUrl,
-                    controller:state.controller,
-                    data:data,
-                    resolve:{
-                        //dataService:function(){return state.dataService;},
-                        modelName:function() {
-                            
-                            return state.model;
-                        },
-                    }
-                });
+                };
+        if('controller' in state)
+            angular.extend(options,{controller:state.controller,cache: false});
+        if('abstract' in state)
+            angular.extend(options,{abstract:state.abstract});
+        if('model' in state)
+            angular.extend(options,{resolve:{modelName:function(){return state.model;}}});
+        if( angular.isDefined(data))
+            angular.extend(options,{data:data});     
+        if('templateUrl' in state)
+            angular.extend(options,{templateUrl:Paths.template+state.templateUrl})
+        if('views' in state)
+            angular.extend(options,data.views);
+            
+        console.dir('add state '+state.name+' with options');console.dir(options);
+        $stateProvider.state(state.name,options);
+        console.dir('------------------------------------------------');
     }
      
     return{
