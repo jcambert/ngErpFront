@@ -9858,3 +9858,8 @@ i.size-96 {
     .card-container .menu-card .list a {
       width: 342px;
       height: 142px; }
+
+.tabs-top .pane .inner {
+  position: relative;
+  top: 90px;
+  height: 100%; }

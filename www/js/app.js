@@ -560,6 +560,20 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
         done();
    }
     
+    
+   $scope.tabsGo = function($event,goto){
+       var parent= $state.parent(true);
+       parent.push(goto);
+       var state=parent.join('.');
+       console.dir(state);
+      
+       
+       
+       $state.go(state);
+   } 
+   $scope.isTabs = function(state){
+       return $state.current.name.split('.').pop()==state;
+   }
      // Cleanup the modal when we're done with it!
     $scope.$on('$destroy', function() {
         //$scope.modal.remove();
@@ -576,6 +590,8 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
         // Execute action
         
     });
+    
+    
     
 }])
 

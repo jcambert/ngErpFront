@@ -2,27 +2,24 @@
      <ion-nav-title  > </ion-nav-title>
      <ng-title ng-model="item" ng-data="state.current.data" ></ng-title>
      
-        
-    <ion-content>
-        <div class="bar bar-header">
-            <h1 class="title">Header</h1>
-        </div>
-        
-            <!--<ion-item class="item item-divider">
-                <a ng-if="!canGoBack()" ng-click="goToList()" class="pull-left">
-                    <i class="icon ion-ios-arrow-back size-24"></i>
-                </a>
-                 <a  ng-click="saveItem()" class="pull-right">
-                    <i class="ion-android-send size-24"></i>
-                </a>
-                 <a   ng-click="goBack()"  ng-if="canGoBack()" class="pull-left">
-                    <i class="ion-ios-arrow-back size-24"></i>
-                </a>
-             </ion-item>-->
-            <ui-view name ='main'></ui-view>
-              
-            
        
-    </ion-content>
     
+        <div class="tabs-striped tabs-top tabs-light">
+            
+            
+            <div class="tabs tabs-icon-top ">
+                <a class="tab-item" ng-click="tabsGo($event,'main')" ng-class="{active: isTabs('main')}"><i class="icon ion-home"></i>Home</a>
+                <a class="tab-item" ng-click="tabsGo($event,'report')"ng-class="{active: isTabs('report')}" >Report</a>
+                <a class="tab-item">Calendar</a>
+            </div>
+            
+        
+            <ion-pane>
+                <div  class="inner">
+                    <ui-view name ='main'></ui-view>
+                </div>
+                
+            </ion-pane>
+       </div>
+
 </ion-view>

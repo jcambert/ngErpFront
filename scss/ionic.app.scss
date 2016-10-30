@@ -54,3 +54,12 @@ $cardHeight:150;
         }
     }
 }
+.tabs-top{
+    .pane {.inner{
+            position:relative;
+            top:($tabs-height*2 )-(4*$tabs-striped-border-width);
+            height:100%;
+            
+        }}
+    
+}

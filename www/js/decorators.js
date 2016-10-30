@@ -78,6 +78,15 @@
                     return state.name == name && state.abstract;
                 }) != -1;
             }
+            
+            
+            $state.parent = function(asArray){
+                var result=$state.current.name.split('.').slice(0,-1);
+                console.dir(result);
+                if(angular.isDefined(asArray) && angular.isBoolean(asArray))
+                    return result;
+                return result.join('.');
+            }
             return $state;
         }
 
