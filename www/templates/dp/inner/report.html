@@ -1,5 +1,38 @@
-
-<label class="item item-input item-floating-label">
-    <span class="input-label">REPORT</span>
-    <input type="number" ng-model="item.numero" type="text" ng-disabled="editMode()" required>
-</label> 
+<ion-content>
+    <ion-list no-lines>
+        <ion-item>
+            <label class="item item-input item-floating-label">
+                <span class="input-label">Avenant</span>
+                <input type="text" placeholder="Avenant" ng-pattern='/^[0-9]{1,7}$/' ng-model="item.version"   required >
+            </label>
+            <label class="item item-input item-floating-label">
+                <span class="input-label">Titre Entete</span>
+                <input type="text" placeholder="Titre entete" ng-model="item.reporttitle">
+            </label>
+            <label class="item item-input item-floating-label">
+                <span class="input-label">Entete</span>
+                <input type="text" placeholder="Titre entete" ng-model="item.reportheader">
+            </label>
+            <label class="item item-input item-floating-label">
+                <span class="input-label">Pied</span>
+                <input type="text" placeholder="Pied entete" ng-model="item.reportfooter">
+            </label>
+             <label class="item item-input item-select" >
+                <div class="input-label">Port</div>
+                <select ng-model="item.port" ng-options="port as port for port in ports "></select>
+            </label> 
+            <label class="item item-input item-floating-label" >
+                <div class="input-label">Ville de Livraison (si franco)</div>
+                <input type="text" placeholder="Ville de Livraison (si franco)" ng-model="item.reportcity">
+            </label> 
+             <label class="item item-input item-select" >
+                <div class="input-label">Délai</div>
+                <select ng-model="item.port" ng-options="delai as delai for delai in delais track by $index"></select>
+            </label> 
+            <label class="item item-input item-select" >
+                <div class="input-label">Reglement</div>
+                <select ng-model="item.port" ng-options="reg as reg for reg in reglements track by $index"></select>
+            </label> 
+        </ion-item>
+    </ion-list>
+</ion-content>

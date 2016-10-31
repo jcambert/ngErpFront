@@ -40,17 +40,29 @@ angular.module('ngErp')
         }else{
             this.addState({model:state, name:'home.'+state+'-edit', url:'/'+state+'-edit/:id',templateUrl:state+'/form.html',controller:'FormController',title:'Gestion '+state,dataService:state+'Service',abstract:true},angular.extend({},data,{mode:'edit'}));
             //this.addState({name:'home.'+state+'-edit.main',url:'/'+state+'-edit/:id/main',views:{name:'main',states:[{name:'main',templateUrl:Paths.template+state+'inner/main.html'}]}});
-           /* _.forEach(data.views,function(view,key){
-                _.forEach(view.states,function(nestedstate){
-                    var optionsview={};
-                    optionsview[view.name]={templateUrl:state+'/inner/'+nestedstate.templateUrl+'.html'}
-                    console.dir({name:'home.'+state+'-edit.'+nestedstate.name,url:'/'+nestedstate.url,views:optionsview});
+            _.forEach(data.views,function(view,key){
+                _.forEach(view.states,function(nestedView){
+                    _.forEach(nestedView.states,function(nestedState){
+                        console.dir(data.views);
+                        console.dir(nestedState);
+                        console.dir(nestedView);
+                        var optionsview={};
+                        optionsview.url=nestedState.url;
+                        optionsview.data=angular.extend({},data, {mode:'edit',nested:true});
+                        optionsview.views={};
+                        optionsview.views[view.name]={templateUrl:Paths.template+state+'/inner/'+nestedState.templateUrl+'.html'}
+                        console.dir({name:'home.'+state+'-edit.'+nestedState.name});
+                        console.dir(optionsview);
+                        $stateProvider.state('home.'+state+'-edit.'+nestedState.name,optionsview);
+                    });
+                    
+                   
                     
                     //this.addState({name:'home.'+state+'-edit.'+nestedstate.name,url:'/'+nestedstate.url,views:optionsview},{});    
                    //this.addState({},{}); 
                 });
                 
-            });*/
+            });
         }
         this.addState({model:state, name:'home.'+state+'-add',  url:'/'+state+'-add?parent&id', templateUrl:state+'/form.html',controller:'FormController',title:'Gestion '+state,dataService:state+'Service'},angular.extend({},data,{mode:'add'}));
         if(data.hasdetail)
@@ -63,6 +75,10 @@ angular.module('ngErp')
          console.dir('------------------------------------------------');
     }
     
+    self.addView = function(state,data){
+        
+        $stateProvider.state(state.name,data);
+    }
     self.addState = function(state,data){
         //return this.temp(state,data);
         console.dir('****************** addState ************************');
@@ -90,6 +106,7 @@ angular.module('ngErp')
     return{
         addStandardState:this.addStandardState,
         addState:this.addState,
+        addView:this.addView,
         registerStandardStates:this.registerStandardStates,
         registerSubmenus:this.registerSubmenus,
         $get:function(){
@@ -252,16 +269,27 @@ angular.module('ngErp')
     var wrapper = null;
     var self=this;
     this.modelName='';
+    this.$scope=null;
     
     
-    
-    this.init = function(modelName,options){
+    this.init = function(modelName,$scope,options){
+        this.$scope=$scope;
         ITEM=sailsResource(modelName,options || {
             copy:{method:'GET',url:'/'+ modelName+'/copy/:id',isArray:false}
         });
         this.modelName = modelName;
         if(  $injector.has(modelName+'Service')){
             wrapper = $injector.get(modelName+'Service');
+            if(angular.isFunction(wrapper.setScope))
+                wrapper.setScope(this.$scope);
+            else 
+                $log.warn('There is no \'setScope\' function in '+modelName + 'Service' );
+                
+            if(angular.isFunction(wrapper.init))
+                wrapper.init();
+            else 
+                $log.warn('There is no \'init\' function in '+modelName + 'Service' );
+            
         }
     }
     
@@ -384,15 +412,63 @@ angular.module('ngErp')
 }])
 
 .service('dpService',['sailsResource','toastr','$log','$q','$rootScope',function(sailsResource,toastr,$log,$q,$rootScope){
-    var Client = sailsResource('client',{});
+    var $scope=null;//initialized by DataService or Manually
+    var Client = sailsResource('client',{
+        ports:{method:'GET',url:'/ports',isArray:false},
+        delais:{method:'GET',url:'/delais',isArray:false},
+        reglements:{method:'GET',url:'/reglements',isArray:false},
+        causesdeclines:{method:'GET',url:'/causesdeclines',isArray:false}
+    });
     
-    var scope = $rootScope.$new();
+    this.init = function(){
+        this.getClients().then(function(clients){$scope.clients=clients});
+        this.getPorts().then(function(ports){$scope.ports=ports;});
+        this.getDelais().then(function(delais){$scope.delais=delais;});
+        this.getReglements().then(function(reglements){$scope.reglements=reglements;});
+        this.getCausesDeclines().then(function(causes){$scope.causesdeclines=causes;});
+    }
+    
+    this.setScope = function(scope){
+        $scope=scope;
+    }
 
-    this.allClient = function(){
-        console.dir('query allClient()');
-        return Client.query({sort:{nom:1}});
+    this.getClients = function(){
+        var d=$q.defer();
+        //console.dir('query allClient()');
+        Client.query({sort:{nom:1}},function(clients){d.resolve(clients);});
+        return d.promise;
     };
     
-
+    this.getPorts = function(){
+        var d=$q.defer();
+        Client.ports(function(items){
+            d.resolve(items);
+        });
+        return d.promise;
+    };
+    
+    this.getDelais = function(){
+        var d=$q.defer();
+        Client.delais(function(items){
+            d.resolve(items);
+        });
+        return d.promise;
+    };
+    
+    this.getReglements = function(){
+        var d=$q.defer();
+        Client.reglements(function(items){
+            d.resolve(items);
+        });
+        return d.promise;
+    };
+    
+    this.getCausesDeclines = function(){
+        var d=$q.defer();
+        Client.causesdeclines(function(items){
+            d.resolve(items);
+        });
+        return d.promise;
+    };
 }])
 ;

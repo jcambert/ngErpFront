@@ -4,10 +4,10 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 
-angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-datepicker','angularMoment'])
+angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-datepicker','angularMoment','matchMedia'])
 .constant('Paths',{template:'templates/'})
 .constant('StandardStates',[
-    {name:'dp',data:{cancopy:true,titles:{list:'Gestion des Offres de Prix ( {{ items.length+1 }} )',add:'une Offre de prix',edit:'l\'offre de prix {{item.numero}} v{{item.version}} '},views:[{name:'toto',states:[{name:'titi', url:'totourl',templateUrl:'templateurl'}]}]}},
+    {name:'dp',data:{cancopy:true,titles:{list:'Gestion des Offres de Prix ( {{ items.length+1 }} )',add:'une Offre de prix',edit:'l\'offre de prix {{item.numero}} v{{item.version}} '},views:[{name:'main',states:[{name:'main',states:[{name:'main', url:'/main',templateUrl:'main',icon:'ion-home'},{name:'report', url:'/report',templateUrl:'report',title:'Rapport',icon:'ion-ios-printer-outline'},{name:'Gestion', url:'/gestion',templateUrl:'gestion',title:'Gestion',icon:'ion-hammer'}]}]}]}},
     {name:'matiere',data:{titles:{list:'Gestion des matieres',add:'une matiere',edit:'la matiere',fields:['nom']}}},
     {name:'chiffragenuancematiere',data:{titles:{list:'Gestion des nuances matieres',add:'une nuance',edit:'la nuance',fields:['nom']}}},
     {name:'chiffragemodeloperation',data:{titles:{list:'Gestion des modele d\'operation',add:'une operation',edit:'l\'operation',fields:['nom']}}},
@@ -71,7 +71,7 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
         erpStateProvider.registerStandardStates();
         $urlRouterProvider.otherwise('/');
     
-        $stateProvider
+        /*$stateProvider
         .state('home.dp-edit.main',{
             url:'/main',
             data:{
@@ -94,8 +94,19 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
                 }
             }
         })
-        ;
-    
+        ;*/
+       /* erpStateProvider.addView({name:'home.dp-edit.main'},{
+            url:'/main',
+            data:{
+                mode:'edit'
+            },
+            views:{
+                'main':{
+                    templateUrl:'templates/dp/inner/main.html'   
+                }
+            }
+        });*/
+        
         angular.extend(toastrConfig, {
 
             templates: {
@@ -402,9 +413,10 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
     $scope.state = $state;
     $scope.title = 'title';
     $scope.item = {};
+    $scope.nestedTabs = [];
     $scope.numberOfItemsToDisplay = 2;
     var dataService= $injector.get('DataService');//$injector.get( modelName+'Service');
-    dataService.init(modelName);
+    dataService.init(modelName,$scope);
     $scope.wrapper=dataService.wrapper();
     
     console.dir('*** NEW FORM CONTROLLER ****');
@@ -442,6 +454,19 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
         dataService.create().then(function(item){$scope.item=item;console.dir($scope.item);}) ;
         //setTitle();
         // $ionicHistory.currentTitle($scope.title);
+    }
+    
+    if(angular.isDefined($state.current.data.nested) && $state.current.data.nested){
+        //$scope.nesteds=
+        console.dir($state.current.data);
+        _.forEach($state.current.data.views,function(view){
+           _.forEach(view.states,function(nestedView){
+               _.forEach(nestedView.states,function(nestedState){
+                   $scope.nestedTabs.push(nestedState);
+                   console.dir(nestedState);
+               })
+           }) 
+        });
     }
     
     $scope.pickdate = function(field){

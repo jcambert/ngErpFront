@@ -1,0 +1,13 @@
+<ion-content>
+    <ion-list no-lines>
+        <ion-item>
+            <ion-toggle ng-model="item.solde" toggle-class="toggle-calm">Solder</ion-toggle>
+            
+            
+            <label class="item item-input item-select" >
+                <div class="input-label">Cause de non retenue</div>
+                <select ng-model="item.port" ng-options="cause as cause for cause in causesdeclines track by $index"></select>
+            </label> 
+        </ion-item>
+    </ion-list>
+</ion-content>
