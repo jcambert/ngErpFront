@@ -76,18 +76,22 @@
             <ion-nav-bar class="bar-positive">
                 <ion-nav-back-button></ion-nav-back-button>
                 <ion-nav-buttons side="left">
-                    <button class="button button-icon button-clear ion-navicon" menu-toggle="left"></button>
+                    <button class="button button-icon button-clear ion-navicon" menu-toggle="left" ng-hide="isTablet()"></button>
                 </ion-nav-buttons>
                 <ion-nav-buttons side="right">
                     <!--<button class="button button-icon button-clear ion-navicon" menu-toggle="right"></button>-->
                 </ion-nav-buttons>
                 <ion-nav-buttons side="right" >
-                    <button class="button icon ion-android-arrow-back" ng-show="formMode()"ng-if="!canGoBack()" ng-click="goToList()"></button>
-                    <button class="button icon ion-android-send" ng-show="formMode() && canGoBack()" ng-click="saveForm(false)"></button>
-                    <button class="button icon ion-ios-download-outline" ng-show="formMode()" ng-click="saveForm(true)"></button>
-                    <button class="button icon ion-ios-copy-outline" ng-show="formMode()"></button>
-                    <button class="button icon ion-ios-trash-outline" ng-show="formMode()"></button>
-                    <button class="button icon ion-ios-printer-outline" ng-show="formMode()"></button>
+                   <!-- <button class="button icon ion-chevron-down" ng-show="formMode() && isTablet()"  ng-click="showActionMenu()"></button>
+                    <button class="button icon ion-android-arrow-back" ng-show="formMode() && !isTablet()" ng-if="!canGoBack()" ng-click="goToList()"></button>
+                    <button class="button icon ion-android-send" ng-show="formMode() && canGoBack() && !isTablet()" ng-click="saveForm(false)"></button>
+                    <button class="button icon ion-ios-download-outline" ng-show="formMode() && !isTablet() " ng-click="saveForm(true)"></button>
+                    <button class="button icon ion-ios-copy-outline" ng-show="formMode() && !isTablet()"></button>
+                    <button class="button icon ion-ios-trash-outline" ng-show="formMode() && !isTablet()"></button>
+                    <button class="button icon ion-ios-printer-outline" ng-show="formMode() && !isTablet()"></button>-->
+                    
+                    <ng-form-menu ng-repeat="btn in formActions track by $index" btn-click="formActionClick($index)" btn-index="$index" btn-data="btn" form-mode="formMode" >
+                    </ng-form-menu>
                 </ion-nav-buttons>
             </ion-nav-bar>
             <ion-nav-view></ion-nav-view>

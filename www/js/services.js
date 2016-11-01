@@ -281,7 +281,7 @@ angular.module('ngErp')
         if(  $injector.has(modelName+'Service')){
             wrapper = $injector.get(modelName+'Service');
             if(angular.isFunction(wrapper.setScope))
-                wrapper.setScope(this.$scope);
+                wrapper.setScope($scope);
             else 
                 $log.warn('There is no \'setScope\' function in '+modelName + 'Service' );
                 
@@ -421,6 +421,7 @@ angular.module('ngErp')
     });
     
     this.init = function(){
+        if(!angular.isDefined($scope))return;
         this.getClients().then(function(clients){$scope.clients=clients});
         this.getPorts().then(function(ports){$scope.ports=ports;});
         this.getDelais().then(function(delais){$scope.delais=delais;});

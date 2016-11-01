@@ -7,12 +7,12 @@
 angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-datepicker','angularMoment','matchMedia'])
 .constant('Paths',{template:'templates/'})
 .constant('StandardStates',[
-    {name:'dp',data:{cancopy:true,titles:{list:'Gestion des Offres de Prix ( {{ items.length+1 }} )',add:'une Offre de prix',edit:'l\'offre de prix {{item.numero}} v{{item.version}} '},views:[{name:'main',states:[{name:'main',states:[{name:'main', url:'/main',templateUrl:'main',icon:'ion-home'},{name:'report', url:'/report',templateUrl:'report',title:'Rapport',icon:'ion-ios-printer-outline'},{name:'Gestion', url:'/gestion',templateUrl:'gestion',title:'Gestion',icon:'ion-hammer'}]}]}]}},
+    {name:'dp',data:{cancopy:true,titles:{list:'Offres de Prix ( {{ items.length+1 }} )',add:'une Offre de prix',edit:'l\'offre de prix {{item.numero}} v{{item.version}} '},views:[{name:'main',states:[{name:'main',states:[{name:'main', url:'/main',templateUrl:'main',icon:'ion-home'},{name:'report', url:'/report',templateUrl:'report',title:'Rapport',icon:'ion-ios-printer-outline'},{name:'Gestion', url:'/gestion',templateUrl:'gestion',title:'Gestion',icon:'ion-hammer'}]}]}]}},
     {name:'matiere',data:{titles:{list:'Gestion des matieres',add:'une matiere',edit:'la matiere',fields:['nom']}}},
-    {name:'chiffragenuancematiere',data:{titles:{list:'Gestion des nuances matieres',add:'une nuance',edit:'la nuance',fields:['nom']}}},
-    {name:'chiffragemodeloperation',data:{titles:{list:'Gestion des modele d\'operation',add:'une operation',edit:'l\'operation',fields:['nom']}}},
-    {name:'client',data:{titles:{list:'Gestion des clients',add:'un client',edit:'le client',fields:['nom']}}},
-    {name:'contact',data:{titles:{list:'Gestion des contacts',add:'un contact',edit:'le contact',fields:['civilite','nom','prenom']}}}
+    {name:'chiffragenuancematiere',data:{titles:{list:'Nuances matieres',add:'une nuance',edit:'la nuance',fields:['nom']}}},
+    {name:'chiffragemodeloperation',data:{titles:{list:'Modeles d\'operation',add:'une operation',edit:'l\'operation',fields:['nom']}}},
+    {name:'client',data:{titles:{list:'Clients',add:'un client',edit:'le client',fields:['nom']}}},
+    {name:'contact',data:{titles:{list:'Contacts',add:'un contact',edit:'le contact',fields:['civilite','nom','prenom']}}}
 ])
 .constant('SubmenusStates',[
     {name:'deviseur',data:{title:'Gestion deviseur'}},
@@ -22,9 +22,22 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
     add:'Ajouter',
     edit:'Editer'
 })
+.constant('FormActions',[
+    {text:'Menu',icon:'ion-chevron-down',show:'formMode isTablet',message:'onShowActionMenu',showActionMenu:true},
+    {text:'Liste',icon:'ion-android-arrow-back',show:'formMode !isTablet',message:'onGoToList',inActionMenu:true},
+    {text:'Sauver',icon:'ion-android-send',show:'formMode !isTablet canGoBack',message:'onSaveForm',inActionMenu:true},
+    {text:'Sauver et Continuer',icon:'ion-ios-download-outline',show:'formMode !isTablet ',message:'onSaveAndContinueForm',inActionMenu:true},
+    {text:'Copier',icon:'ion-ios-copy-outline',show:'formMode !isTablet ',message:'onCopyForm',inActionMenu:true},
+    {text:'Supprimer',icon:'ion-ios-trash-outline',show:'formMode !isTablet ',message:'onDeleteForm',inActionMenu:true},
+    {text:'Imprimer',icon:'ion-ios-printer-outline',show:'formMode !isTablet ',message:'onPrintForm',inActionMenu:true},
+])
 .constant('Messages',{
     onModelChanged:'onModelChanged',
+    onShowActionMenu:'onShowActionMenu',
+    onGoToList:'onGoToList',
+    onGoBack:'onGoBack',
     onSaveForm:'onSaveForm',
+    onSaveAndContinueForm:'onSaveAndContinueForm',
     onCopyForm:'onCopyForm',
     onDeleteForm:'onDeleteForm',
     onPrintForm:'onPrintForm'
@@ -184,7 +197,7 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
     }
 }])
 
-.controller('MainController',['$rootScope', '$scope','$state','Messages',function($rootScope,$scope,$state,messages){
+.controller('MainController',['$rootScope', '$scope','$state','Messages','$ionicActionSheet','screenSize','FormActions',function($rootScope,$scope,$state,messages,$ionicActionSheet,screenSize,FormActions){
     
     /*$rootScope.$on('$stateChangeStart', 
         function(event, toState, toParams, fromState, fromParams, options){ 
@@ -194,49 +207,113 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
             console.dir($scope.formMode());
          });*/
 
+    $scope.formActions=FormActions;
+    
+    //$scope.isTablet = screenSize.is('xs') ;
+    
+    $scope.formActionClick = function(index){
+        $rootScope.$broadcast(FormActions[index].message);
+    }
+    
+    $rootScope.$on(FormActions[0].message,function(event,args){
+        $scope.showActionMenu();
+    });
+    
+    $rootScope.$on(FormActions[1].message,function(event,args){
+        
+            $scope.goToList();
+    })
     
     $rootScope.$on(messages.onModelChanged,function(event,args){
         console.dir(args);
         $scope.modelName=args.modelName;
         $scope.mode=args.mode;
+        //$scope.formMode  = ($scope.mode =='edit' || $scope.mode=='add');
+        //$scope.listMode = $scope.mode == 'list';
     })
     
     $scope.formMode = function(){
         return $scope.mode =='edit' || $scope.mode=='add';
-    }
+    };
     
     $scope.listMode = function(){
         return $scope.mode == 'list';
-    }
+    };
     $scope.saveForm = function(continueModify){
         $rootScope.$broadcast(messages.onSaveForm,{continueModify:continueModify});
-    }
+    };
 
-    
+    $scope.saveAndContinueForm = function(){
+        $rootScope.$broadcast(messages.onSaveAndContinueForm);
+    }
     $scope.copyForm = function(){
         $rootScope.$broadcast(messages.onCopyForm);
-    }
+    };
     
     $scope.deleteForm = function(){
         $rootScope.$broadcast(messages.onDeleteForm);
-    }
+    };
     
     $scope.printForm = function(){
         $rootScope.$broadcast(messages.onPrintForm);    
-    }
+    };
     
     $scope.goBack = function(){
         $state.historyBack();//goBack();
-    }
+    };
     
     $scope.canGoBack = function(){
         return $state.canGoBack();
-    }
+    };
     
     $scope.goToList = function(){
         //alert($scope.modelName);
         $state.go('home.'+$scope.modelName);
+    };
+    
+    $scope.showActionMenu = function(){
+        var btns=_.filter(FormActions,function(btn){return btn.inActionMenu});
+        var tpl =  angular.element('<div><i class="icon "></i></div>') ;console.dir(tpl.html());
+        var buttons=[];
+        
+        angular.forEach(btns,function(btn){
+            var tmp='<i class="icon '+ btn.icon+'"></i>'+ (btn.text ||'');
+            buttons.push({text: tmp});
+        })
+        console.dir(buttons);
+        $ionicActionSheet.show({
+            titleText: 'Menu',
+            /*buttons: [
+                { text: '<i class="icon ion-android-arrow-back" ng-if="!canGoBack()"></i>Retour ' },
+                { text: '<i class="icon ion-android-send" ng-if="canGoBack()"></i>Sauver ' },
+                { text: '<i class="icon ion-ios-download-outline"></i> Sauver et rester' },
+                { text: '<i class="icon ion-ios-copy-outline"></i> Copier' },
+                { text: '<i class="icon ion-ios-trash-outline"></i> Supprimer' },
+                { text: '<i class="icon ion-ios-printer-outline"></i> Imprimer' },
+            ],*/
+            buttons:buttons,
+            //destructiveText: 'Delete',
+            //cancelText: 'Annuler',
+            /*cancel: function() {
+                console.log('CANCELLED');
+            },*/
+            buttonClicked: function(index) {
+                console.log('BUTTON CLICKED', index);
+                $rootScope.$broadcast(btns[index].message);
+                return true;
+            },
+            /*destructiveButtonClicked: function() {
+                console.log('DESTRUCT');
+                return true;
+            }*/
+        });
+    };
+    
+    $scope.isTablet=function(){
+        return screenSize.is('xs') ;
     }
+    
+
     
 }])
 .controller('LeftMenuController',['$scope','MenuService', function($scope,MenuService){
@@ -429,6 +506,10 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
         //alert('save');
         $scope.saveItem(args);
     });
+    $scope.$on(messages.onSaveAndContinueForm,function(event,args){
+        //alert('save');
+        $scope.saveItem({continueModify:true});
+    });
     $scope.$on(messages.onCopyForm,function(event,args){
         alert('copy');
     });
@@ -549,6 +630,7 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
                 $scope.item[$scope.currentItem.collection].push($scope.currentItem.item);
             $scope.modal.hide();
         }else{
+            args=angular.extend({},args || {});
             if(! ('continueModify' in args))
                 args.continueModify=false;
             
@@ -687,5 +769,66 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
     }
     
 }])
-
+.directive('ngFormMenu',['$compile','screenSize',function($compile,screenSize){
+    
+    function isTablet(){
+        return screenSize.is('xs') ;
+    
+    }
+    return{
+        restrict:'E',
+        scope:{
+            btnData:'=',
+            btnIndex:'=',
+            btnClick:'&',
+            formMode:'=',
+            //isTablet:'='
+        },
+        replace:true,
+        //template:'<button class="button icon " ></button>',
+        link:function($scope,$element,attrs){
+           // if(!angular.isDefined($scope.isTablet))
+            $scope.isTablet = isTablet;
+            
+            var tpl=angular.element('<button ng-resizable class="button icon " ></button>');
+            tpl.addClass($scope.btnData.icon);
+            var shows=_.filter($scope.btnData.show.split(' '),String);
+            angular.forEach(shows,function(show,index){
+                shows[index]=show+'()';
+            });
+            console.dir(_.filter(shows,String));
+            tpl.attr('ng-hide','!('+shows.join(' && ')+')');
+            tpl.click($scope.btnClick);
+            /*tpl.on('click',function(e){
+                alert($scope.isTablet());
+            })*/
+            $element.replaceWith($compile(tpl)($scope));
+            
+            
+        }
+    }
+    
+}])
+.directive('ngResizable',['$window',function($window){
+    return{
+        restrict:'A',
+        link:function($scope,$element,attr){
+            function initializeWindowSize (){
+                $scope.windowHeight = $window.innerHeight;
+                $scope.windowWidth = $window.innerWidth;
+            };
+            function cleanUp() {
+                angular.element($window).off('resize', onResize);
+            }
+            function onResize(){
+                //console.dir($scope.windowWidth)
+                initializeWindowSize();
+                $scope.$apply(); 
+            }
+            initializeWindowSize();
+            angular.element($window).bind('resize',onResize);
+            $scope.$on('$destroy', cleanUp);
+        }
+    }
+}])
 ;
