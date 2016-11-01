@@ -1,10 +1,7 @@
-
-<ion-modal-view>
-    <ion-header-bar class="bar bar-header bar-positive">
-        <h1 class="title">{{currentItem.id?'Editer':'Ajouter'}}</h1>
-        <button class="button button-clear button-primary" ng-click="modal.hide()">Annuler</button>
-    </ion-header-bar>
-    <ion-content class="padding">
+<ion-view cache-view="false" >
+     <ion-nav-title  > </ion-nav-title>
+     <ng-title ng-model="item" ng-data="state.current.data" ></ng-title>
+      <ion-content class="padding">
         <div class="list">
             <label class="item item-input">
                 <span class="input-label">Numero</span>
@@ -14,4 +11,5 @@
             <button class="button button-full button-positive" ng-click="saveItem()">Sauver</button>
         </div>
     </ion-content>
-</ion-modal-view>
+     
+</ion-view>
