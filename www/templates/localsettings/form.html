@@ -1,0 +1,21 @@
+<ion-view cache-view="false" >
+     <ion-nav-title  > </ion-nav-title>
+     <ng-title ng-model="item" ng-data="state.current.data" ></ng-title>
+     
+       
+    
+       <ion-content >
+        <ion-list>
+            
+             <ion-item>
+                <label class="item item-input  item-floating-label"">
+                    <span class="input-label">Serveur Rest</span>
+                    <input placeholder="Serveur Rest" ng-model="item.restserver" type="text" required>
+                </label>
+                
+            </ion-item>
+            <button class="button button-full button-positive" ng-click="saveItem()">Sauver</button>
+        </ion-list>
+    </ion-content>
+
+</ion-view>

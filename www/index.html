@@ -46,15 +46,17 @@
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-moment/1.0.0/angular-moment.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-toastr/2.1.1/angular-toastr.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-media-queries/0.6.1/match-media.min.js"></script>
-        
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-local-storage/0.5.0/angular-local-storage.min.js"></script>    
     
     
     
     
     <!--Angular/Sails resource -->
-    <script src="/lib/sails.io.js/dist/sails.io.js"></script>
+    <script src="/lib/sails.io.js/dist/sails.io.js" autoConnect="false"></script>
     <script type="text/javascript">
-        io.sails.url = 'http://192.6.2.72:1337';
+        //io.sails.url = 'http://192.6.2.72:1337';
+        io.sails.url = 'localhost:1337';
+         
     </script>
     <script src="lib/angular-resource-sails/src/sailsResource.js"></script>
     
@@ -113,7 +115,7 @@
          <ion-side-menu side="right" >
             <ion-list >
                
-                <ion-item menu-close ui-sref="home.settings">
+                <ion-item menu-close ui-sref="home.localsettings">
                     <i class="ion-gear-b size-14"></i>
                     Parametres
                 </ion-item>

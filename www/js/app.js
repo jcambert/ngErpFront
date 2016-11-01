@@ -4,7 +4,7 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 
-angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-datepicker','angularMoment','matchMedia'])
+angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-datepicker','angularMoment','matchMedia','LocalStorageModule'])
 .constant('Paths',{template:'templates/'})
 .constant('StandardStates',[
     {name:'dp',data:{cancopy:true,titles:{list:'Offres de Prix ( {{ items.length+1 }} )',add:'une Offre de prix',edit:'l\'offre de prix {{item.numero}} v{{item.version}} '},views:[{name:'main',states:[{name:'main',states:[{name:'main', url:'/main',templateUrl:'main',icon:'ion-home'},{name:'report', url:'/report',templateUrl:'report',title:'Rapport',icon:'ion-ios-printer-outline'},{name:'Gestion', url:'/gestion',templateUrl:'gestion',title:'Gestion',icon:'ion-hammer'}]}]}]}},
@@ -53,6 +53,10 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
             template:'<ion-nav-view></ion-nav-view>',
             abstract:true
         })
+        .state('home.main',{
+            url:'/main',
+            templateUrl:'templates/main.html'
+        })
         .state('home.settings',{
             url:'/settings',
             templateUrl:'templates/submenus.html',
@@ -78,11 +82,21 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
                 title:'Edition de menu'
             }
         })
-
+        .state('home.localsettings',{
+            url:'/localsettings',
+            templateUrl:'templates/localsettings/form.html',
+            controller:'LocalSettingsController',
+            data:{
+                titles:{
+                    edit:'Configuration Locale'
+                },
+                mode:'edit'
+            }
+        })
        
         erpStateProvider.registerSubmenus(); 
         erpStateProvider.registerStandardStates();
-        $urlRouterProvider.otherwise('/');
+        $urlRouterProvider.otherwise('/main');
     
         /*$stateProvider
         .state('home.dp-edit.main',{
@@ -197,7 +211,7 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
     }
 }])
 
-.controller('MainController',['$rootScope', '$scope','$state','Messages','$ionicActionSheet','screenSize','FormActions',function($rootScope,$scope,$state,messages,$ionicActionSheet,screenSize,FormActions){
+.controller('MainController',['$rootScope', '$scope','$state','Messages','$ionicActionSheet','$ionicHistory','screenSize','FormActions','localStorageService',function($rootScope,$scope,$state,messages,$ionicActionSheet,$ionicHistory,screenSize,FormActions,localStorageService){
     
     /*$rootScope.$on('$stateChangeStart', 
         function(event, toState, toParams, fromState, fromParams, options){ 
@@ -206,7 +220,11 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
             $scope.mode='list';
             console.dir($scope.formMode());
          });*/
-
+    console.dir('//////// MAIN CONTROLLER  ////////////////');
+    io.socket.on('connect', function socketConnected() {console.dir('MainController sails connected')});
+    io.sails.url =  localStorageService.get('localsettings').restserver;
+    io.sails.connect();
+    console.dir(io.sails.url);
     $scope.formActions=FormActions;
     
     //$scope.isTablet = screenSize.is('xs') ;
@@ -312,11 +330,12 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
     $scope.isTablet=function(){
         return screenSize.is('xs') ;
     }
-    
+    console.dir('---------- MAIN CONTROLLER --------------');
 
     
 }])
 .controller('LeftMenuController',['$scope','MenuService', function($scope,MenuService){
+    io.socket.on('connect', function socketConnected() {console.dir('LeftMenuController sails connected')});
     MenuService.getLeftMenu().then(function(menus){$scope.menus=menus;});
 }])
 .controller('SettingsController',['$scope','$state','MenuService', function($scope,$state,MenuService){
@@ -344,6 +363,26 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
         .catch(function(err){
             console.dir(err);
         })
+}])
+.controller('LocalSettingsController',['$scope','$state','localStorageService','$ionicHistory', function($scope,$state,localStorageService,$ionicHistory){
+    $scope.state = $state;
+    $scope.item = localStorageService.get('localsettings') ||{};
+    console.dir($scope.item);
+    $scope.$watch('item',function(oldv,newv){ 
+        console.dir('Rest Server has changed');
+        console.dir(oldv);
+        console.dir(newv);
+    },true);
+ 
+    $scope.saveItem = function(){
+        console.dir($scope.item.restserver)
+        localStorageService.set('localsettings',$scope.item);
+        $ionicHistory.nextViewOptions({
+            //disableAnimate: true,
+            disableBack: true
+        });
+        $state.go('home.main');
+    }
 }])
 
 .controller('MenuListController',['$scope','$state','MenuService','$ionicModal','toastr',function($scope,$state,MenuService,$ionicModal,toastr){
@@ -747,7 +786,8 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
                     if(!angular.isDefined($scope.ngModel))return;
                     var elt= angular.element('<span></span>');
                     $scope.item=$scope.ngModel;
-                    
+                    console.dir(mode[$scope.ngData.mode]);
+                    console.dir($scope.ngData.titles[$scope.ngData.mode]);
                     var result=mode[$scope.ngData.mode]+' '+$scope.ngData.titles[$scope.ngData.mode];
                     if($scope.ngData.mode=='edit' && $scope.ngData.titles.fields){
                         result=result+' '+$scope.ngData.titles.fields.map(function(item){return $scope.ngModel[item]}).join(' ');
