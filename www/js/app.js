@@ -221,7 +221,7 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
             console.dir($scope.formMode());
          });*/
     console.dir('//////// MAIN CONTROLLER  ////////////////');
-    io.socket.on('connect', function socketConnected() {console.dir('MainController sails connected')});
+    io.socket.on('connect', function() {console.dir('MainController sails connected')});
     io.sails.url =  localStorageService.get('localsettings').restserver;
     io.sails.connect();
     console.dir(io.sails.url);

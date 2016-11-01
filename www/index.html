@@ -55,8 +55,11 @@
     <script src="/lib/sails.io.js/dist/sails.io.js" autoConnect="false"></script>
     <script type="text/javascript">
         //io.sails.url = 'http://192.6.2.72:1337';
-        io.sails.url = 'localhost:1337';
-         
+        io.sails.url = 'http://localhost:1337';
+         io.socket.on('connect', function(){
+           console.dir(' sails connected');;
+        });
+       // io.sails.connect();
     </script>
     <script src="lib/angular-resource-sails/src/sailsResource.js"></script>
     
