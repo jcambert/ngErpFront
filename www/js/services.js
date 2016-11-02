@@ -336,10 +336,13 @@ angular.module('ngErp')
     };
     
     this.create = function(){
-        if(angular.isFunction(wrapper.create))
-            return wrapper.create(new ITEM())
+        if(angular.isFunction(wrapper.create)){
+            console.dir(new ITEM());
+            return wrapper.create(new ITEM());
+        }
             
         return $q(function(resolve, reject) {
+            
             resolve(new ITEM());
         });
     };
@@ -462,7 +465,12 @@ angular.module('ngErp')
 
     this.create = function(item){
         var d = $q.defer();
-        Dp.maxnumero(function(numero){console.dir(numero); item.numero=numero.nummero+1;d.resolve(item)});
+        Dp.maxnumero(function(numero){
+            console.dir(numero.numero);
+             item.numero=Number(numero.numero)+1;
+             console.dir(item);
+             d.resolve(item);
+            });
         return d.promise;
     }
 
