@@ -54,10 +54,13 @@
     <!--Angular/Sails resource -->
     <script src="/lib/sails.io.js/dist/sails.io.js" autoConnect="false"></script>
     <script type="text/javascript">
-        //io.sails.url = 'http://192.6.2.72:1337';
-        io.sails.url = 'http://localhost:1337';
+        io.sails.url = 'http://192.6.2.72:1337';
+        //io.sails.url = 'http://localhost:1337';
+        io.socket.on('message', function(msg){
+            console.log(msg);
+        });
          io.socket.on('connect', function(){
-           console.dir(' sails connected');;
+           console.dir(' sails connected');
         });
        // io.sails.connect();
     </script>
@@ -95,7 +98,7 @@
                     <button class="button icon ion-ios-trash-outline" ng-show="formMode() && !isTablet()"></button>
                     <button class="button icon ion-ios-printer-outline" ng-show="formMode() && !isTablet()"></button>-->
                     
-                    <ng-form-menu ng-repeat="btn in formActions track by $index" btn-click="formActionClick($index)" btn-index="$index" btn-data="btn" form-mode="formMode" >
+                    <ng-form-menu ng-repeat="btn in formActions track by $index" btn-click="formActionClick($index)" btn-index="$index" btn-data="btn" form-mode="formMode" add-mode="addMode">
                     </ng-form-menu>
                 </ion-nav-buttons>
             </ion-nav-bar>
@@ -103,7 +106,10 @@
         </ion-side-menu-content>
         <ion-side-menu side="left" ng-controller="LeftMenuController">
             <ion-list >
-                
+                <ion-item menu-close ui-sref="home.main" >
+                    <i class="ion-home size-14"></i>
+                    Accueil
+                </ion-item>
                 <ion-item menu-close ui-sref="home.settings" ng-if="menus.length==0">
                     <i class="ion-gear-b size-14"></i>
                     Parametres

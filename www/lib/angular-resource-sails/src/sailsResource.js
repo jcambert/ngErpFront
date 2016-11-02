@@ -9,7 +9,7 @@
 		isFunction = angular.isFunction;
 
 	angular.module('sailsResource', []).provider('sailsResource', function () {
-
+       // console.dir('sailsResource Provider Created');
 		var DEFAULT_CONFIGURATION = {
 			// Set a route prefix, such as '/api'
 			prefix: '',
@@ -75,7 +75,7 @@
 			}
 
 			// Create our socket instance based on options
-
+            //console.dir('sailsResource socket creation');
 			var socket;
 			if (options.socket) { // Was given to us
 				socket = options.socket;

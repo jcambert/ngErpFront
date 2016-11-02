@@ -64,7 +64,7 @@ angular.module('ngErp')
                 
             });
         }
-        this.addState({model:state, name:'home.'+state+'-add',  url:'/'+state+'-add?parent&id', templateUrl:state+'/form.html',controller:'FormController',title:'Gestion '+state,dataService:state+'Service'},angular.extend({},data,{mode:'add'}));
+        this.addState({model:state, name:'home.'+state+'-add',  url:'/'+state+'-add?parent&id', templateUrl:state+'/add.html',controller:'FormController',title:'Gestion '+state,dataService:state+'Service'},angular.extend({},data,{mode:'add'}));
         if(data.hasdetail)
             this.addState({model:state, name:'home.'+state+'-detail', url:'/'+state+'-detail/:id',templateUrl:state+'/detail.html',controller:'DetailController',title:'Détail '+state,dataService:state+'Service'},data);
     }
@@ -263,7 +263,26 @@ angular.module('ngErp')
     }
 }])
 
-
+.service('StandardStatesService',['StandardStates','$state',function(StandardStates,$state){
+    this.getEditState = function(stateName){
+        var statedef=_.filter(StandardStates,function(ss){return ss.name==stateName});
+        console.dir(statedef);
+        statedef=statedef[0].data;
+        if(!angular.isDefined(statedef))return;
+        var parent= $state.parent(true);
+        parent.push(stateName+ '-edit');
+        if(statedef.views && statedef.views.length>0){
+            console.dir('stage 1');
+            var view=statedef.views[0];
+            if(view.states && view.states.length>0){
+                console.dir('stage 2');
+                parent.push(view.states[0].name);
+            }
+        }
+        console.dir(parent);
+        return parent.join('.');
+    }
+}])
 .factory('DataService',['sailsResource','toastr','$log','$q','$rootScope','$injector',function(sailsResource,toastr,$log,$q,$rootScope,$injector){
     var ITEM = null;
     var wrapper = null;
@@ -317,6 +336,9 @@ angular.module('ngErp')
     };
     
     this.create = function(){
+        if(angular.isFunction(wrapper.create))
+            return wrapper.create(new ITEM())
+            
         return $q(function(resolve, reject) {
             resolve(new ITEM());
         });
@@ -417,8 +439,13 @@ angular.module('ngErp')
         ports:{method:'GET',url:'/ports',isArray:false},
         delais:{method:'GET',url:'/delais',isArray:false},
         reglements:{method:'GET',url:'/reglements',isArray:false},
-        causesdeclines:{method:'GET',url:'/causesdeclines',isArray:false}
+        causesdeclines:{method:'GET',url:'/causesdeclines',isArray:false},
+        
     });
+    
+    var Dp = sailsResource('dp',{
+        maxnumero:{method:'GET',url:'/dp/max',isArray:false}
+    })
     
     this.init = function(){
         if(!angular.isDefined($scope))return;
@@ -431,6 +458,12 @@ angular.module('ngErp')
     
     this.setScope = function(scope){
         $scope=scope;
+    }
+
+    this.create = function(item){
+        var d = $q.defer();
+        Dp.maxnumero(function(numero){console.dir(numero); item.numero=numero.nummero+1;d.resolve(item)});
+        return d.promise;
     }
 
     this.getClients = function(){
