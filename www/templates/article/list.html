@@ -1,0 +1,7 @@
+<ion-view cache-view="false" >
+    <ion-nav-title>  </ion-nav-title>
+    <ng-title ng-model="items" ng-data="state.current.data" ></ng-title>
+    <erp-view-list>
+        <erp-view-list-content item="$parent.item" >{{item.id}} <h4>N°{{item.reference}}</h4> <p>{{item.designation}} </p><span class="badge badge-assertive" ng-show="item.indice"> {{item.indice}}</span></erp-view-list-content>
+    </erp-view-list>
+</ion-view>

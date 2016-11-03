@@ -2,7 +2,7 @@
     <ion-content  on-infinite-scroll="addMoreItem">
         <ion-list can-swipe="state.current.data.hasdetail || state.current.data.candelete ">
               
-             <ion-item class="item item-divider row">
+            <!-- <ion-item class="item item-divider row">
                  <a ng-click="addItem()">
                     <i class="ion-plus size-24 col-10" ></i>
                 </a>
@@ -10,7 +10,7 @@
                     <i class="icon ion-search placeholder-icon"></i>
                     <input type="text" placeholder="Search">
                 </label>
-             </ion-item>
+             </ion-item>-->
             <ion-item  ng-repeat="item in items | limitTo:numberOfItemsToDisplay" >
                
                     <!--<i class="icon ion-edit size-24"></i>-->

@@ -1,0 +1,29 @@
+<ion-view cache-view="false" >
+     <ion-nav-title  > </ion-nav-title>
+     <ng-title ng-model="item" ng-data="state.current.data" ></ng-title>
+     
+       
+    
+        <div class="tabs-striped tabs-top tabs-light" ng-show="nestedTabs.length>0">
+            
+            
+            <div class="tabs tabs-icon-top ">
+               <!-- <a class="tab-item" ng-click="tabsGo($event,'main')" ng-class="{active: isTabs('main')}"><i class="icon ion-home"></i>Home</a>
+                <a class="tab-item" ng-click="tabsGo($event,'report')"ng-class="{active: isTabs('report')}" >Report</a>
+                <a class="tab-item">Calendar</a>-->
+                <a  ng-repeat="tb in nestedTabs" class="tab-item" ng-click="tabsGo($event,tb.name)"ng-class="{active: isTabs(tb.name)}" >
+                    <i ng-show="tb.icon" class="icon {{tb.icon}}"></i>
+                    <p ng-show="tb.title">{{tb.title}}</p>
+                </a>
+            </div>
+            
+        
+            <ion-pane>
+                <div  class="inner">
+                    <ui-view name ='main'></ui-view>
+                </div>
+                
+            </ion-pane>
+       </div>
+
+</ion-view>

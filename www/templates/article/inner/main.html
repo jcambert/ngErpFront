@@ -1,0 +1,18 @@
+<ion-content>
+    <ion-list >
+        <ion-item>
+            <label class="item item-input item-floating-label">
+                <span class="input-label">Reference</span>
+                <input type="text"ng-model="item.reference"  ng-disabled="editMode()" required>
+            </label>    
+            <label class="item item-input item-floating-label" >
+                <div class="input-label">Designation</div>
+                <input type="text" ng-model="item.designation" >
+            </label> 
+            <label class="item item-input item-floating-label">
+                <span class="input-label">Indice</span>
+                <input type="text" ng-model="item.indice"  placeholder="Indice" >
+            </label>
+        </ion-item>
+    </ion-list>
+</ion-content>

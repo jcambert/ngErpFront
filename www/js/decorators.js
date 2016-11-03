@@ -16,16 +16,16 @@
             
             $rootScope.$on("$stateChangeSuccess", function (ev, to, toParams, from, fromParams) {
                 $state.previous = { route: from, routeParams: fromParams };
-                $log.log('------------------------------------------------------------');
-                if($state.canGoBack())
-                    $log.log('Last:'+$state.historyBackState().route.name);
-                $log.log('from:'+from.name);
-                $log.log('to:'+to.name);
+               // $log.log('------------------------------------------------------------');
+                //if($state.canGoBack())
+                //    $log.log('Last:'+$state.historyBackState().route.name);
+               // $log.log('from:'+from.name);
+               // $log.log('to:'+to.name);
                 //if(history.length==0 || (  history.length>0 &&  history[history.length-1].route.name != from.name)){
                 if(!goback){
                     history.push($state.previous);
-                    $log.log('push history:'+from.name);
-                    $log.log($state.historyBackState().route);
+                 //   $log.log('push history:'+from.name);
+                 //   $log.log($state.historyBackState().route);
                 }
                 goback=false;
             });

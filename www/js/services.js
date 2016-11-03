@@ -28,11 +28,11 @@ angular.module('ngErp')
     }
     
     self.addStandardState= function(state,data){
-        console.log(state);
-        console.dir(data);
+       // console.log(state);
+        //console.dir(data);
         var defaultdata={hasdetail:false,candelete:true,canedit:true,cancopy:false};
         data=angular.extend({},defaultdata,data);
-        console.dir(data);
+        //console.dir(data);
         this.addState({model:state, name:'home.'+state, url:'/'+state,templateUrl:state+'/list.html',controller:'ListController',title:'Liste des '+state,dataService:state+'Service'},angular.extend({},data,{mode:'list'}));
         
         if(!('views' in data)){
@@ -42,19 +42,20 @@ angular.module('ngErp')
             //this.addState({name:'home.'+state+'-edit.main',url:'/'+state+'-edit/:id/main',views:{name:'main',states:[{name:'main',templateUrl:Paths.template+state+'inner/main.html'}]}});
             _.forEach(data.views,function(view,key){
                 _.forEach(view.states,function(nestedView){
-                    _.forEach(nestedView.states,function(nestedState){
-                        console.dir(data.views);
-                        console.dir(nestedState);
-                        console.dir(nestedView);
+                   // _.forEach(nestedView.states,function(nestedState){
+                        //console.dir(data.views);
+                        //console.dir(nestedState);
+                        //console.dir(nestedView);
                         var optionsview={};
-                        optionsview.url=nestedState.url;
+                        optionsview.url=nestedView.url;
                         optionsview.data=angular.extend({},data, {mode:'edit',nested:true});
                         optionsview.views={};
-                        optionsview.views[view.name]={templateUrl:Paths.template+state+'/inner/'+nestedState.templateUrl+'.html'}
-                        console.dir({name:'home.'+state+'-edit.'+nestedState.name});
+                        optionsview.views[view.name]={templateUrl:Paths.template+state+'/inner/'+nestedView.templateUrl+'.html'};
+                        console.dir('home.'+state+'-edit.'+nestedView.name);
+                        console.dir(nestedView);
                         console.dir(optionsview);
-                        $stateProvider.state('home.'+state+'-edit.'+nestedState.name,optionsview);
-                    });
+                        $stateProvider.state('home.'+state+'-edit.'+nestedView.name,optionsview);
+                    //});
                     
                    
                     
@@ -70,9 +71,9 @@ angular.module('ngErp')
     }
     
     this.temp = function(state,data){
-        console.dir('****************** addState ************************');
+       // console.dir('****************** addState ************************');
         
-         console.dir('------------------------------------------------');
+      //  console.dir('------------------------------------------------');
     }
     
     self.addView = function(state,data){
@@ -81,7 +82,7 @@ angular.module('ngErp')
     }
     self.addState = function(state,data){
         //return this.temp(state,data);
-        console.dir('****************** addState ************************');
+       // console.dir('****************** addState ************************');
         var options={
                     url:state.url,
                 };
@@ -98,9 +99,9 @@ angular.module('ngErp')
         if('views' in state)
             angular.extend(options,data.views);
             
-        console.dir('add state '+state.name+' with options');console.dir(options);
+        //console.dir('add state '+state.name+' with options');console.dir(options);
         $stateProvider.state(state.name,options);
-        console.dir('------------------------------------------------');
+        //console.dir('------------------------------------------------');
     }
      
     return{
@@ -115,6 +116,23 @@ angular.module('ngErp')
     }
 }])
 
+.service('ModeService',['$state',function($state){
+    this.add = function(){
+        return $state.current.data.mode == 'add';
+    }
+    
+    this.edit = function(){
+        return $state.current.data.mode == 'edit';
+    }
+    
+    this.list = function(){
+        return $state.current.data.mode == 'list';
+    }
+    
+    this.change = function(mode){
+        $state.current.data.mode == mode;
+    }
+}])
 .service('MenuService',['sailsResource','toastr','$log','$q',function(sailsResource,toastr,$log,$q){
     var Menu=sailsResource('Menu',{
         byname:{method:'GET',url:'/menu/byname/:name',isArray:false},
@@ -318,6 +336,13 @@ angular.module('ngErp')
             return wrapper[method](args);
     }
     
+    function hasWrapper(method){
+        if(!angular.isDefined(wrapper) || wrapper==null )return false;
+        if(angular.isDefined(method))
+            return angular.isFunction(wrapper[method]);
+        return false;
+    }
+    
     this.all = function(options){
         var toptions={}
        
@@ -336,7 +361,7 @@ angular.module('ngErp')
     };
     
     this.create = function(){
-        if(angular.isFunction(wrapper.create)){
+        if(hasWrapper('create')){
             console.dir(new ITEM());
             return wrapper.create(new ITEM());
         }
@@ -508,6 +533,34 @@ angular.module('ngErp')
     this.getCausesDeclines = function(){
         var d=$q.defer();
         Client.causesdeclines(function(items){
+            d.resolve(items);
+        });
+        return d.promise;
+    };
+}])
+
+.service('ChiffrageService',['sailsResource','toastr','$log','$q','$rootScope','ModeService',function(sailsResource,toastr,$log,$q,$rootScope,mode){
+     var $scope=null;//initialized by DataService or Manually
+    var Article = sailsResource('article',{
+        
+    })
+    
+
+    
+    this.init = function(){
+        if(!angular.isDefined($scope))return;
+        if(mode.add())
+            this.getArticles().then(function(items){$scope.articles=items});
+        
+    }
+    
+    this.setScope = function(scope){
+        $scope=scope;
+    }
+    
+     this.getArticles = function(){
+        var d=$q.defer();
+        Article.query(function(items){
             d.resolve(items);
         });
         return d.promise;

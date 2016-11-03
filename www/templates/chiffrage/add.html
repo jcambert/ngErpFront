@@ -1,0 +1,29 @@
+<ion-view cache-view="false" >
+     <ion-nav-title  > </ion-nav-title>
+     <ng-title ng-model="item" ng-data="state.current.data" ></ng-title>
+      <ion-content class="padding">
+        <ion-list>
+            <ion-item>
+                <label class="item item-input  item-select">
+                    <span class="input-label">Article</span>
+                    <select ng-model="item.article" ng-options="client as client.nom for client in clients track by client.id"></select>
+                </label>
+                <label class="item item-input item-floating-label">
+                    <span class="input-label">Designation</span>
+                    <input type="text" ng-model="item.designationIndice"  placeholder="Designation Chiffrage" required>
+                </label>
+                <label class="item item-input item-floating-label">
+                    <span class="input-label">Indice</span>
+                    <input type="text" ng-model="item.indice"  placeholder="Indice Chiffrage" required>
+                </label>
+            </ion-item>
+            <ion-item>
+                <button class="button  button-positive" ng-click="saveItem()" ng-show="isTablet()">Sauver</button>
+                <button class="button  button-assertive" ng-click="cancel()" ng-show="isTablet()">Annuler</button>
+            </ion-item>
+        </ion-list>
+    </ion-content>
+     
+</ion-view>
+
+
