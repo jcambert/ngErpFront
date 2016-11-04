@@ -525,7 +525,10 @@ angular.module('ngErp', ['ionic','toastr','sailsResource', 'formlyIonic','ionic-
         alert('print');
     });
     
-
+    $scope.onSelect = function (item) {
+        console.log('item', item);
+    };
+    
     $scope.editMode = function(){
         return $scope.state.current.data.mode =='edit';    
     };

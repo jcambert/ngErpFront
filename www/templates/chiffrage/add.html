@@ -2,8 +2,27 @@
      <ion-nav-title  > </ion-nav-title>
      <ng-title ng-model="item" ng-data="state.current.data" ></ng-title>
       <ion-content class="padding">
-        <ion-list>
+        <ion-list>{{articles}}
             <ion-item>
+                <div class="bar bar-header item-input-inset">
+                    <label class="item-input-wrapper">
+                        <i class="icon ion-search placeholder-icon"></i>
+                        <input type="text" placeholder="Reference Article " >
+                    </label>
+                    <button class="button ">Cancel</button> 
+                </div>
+                <ion-autocomplete
+                    id="titi"
+                    ng-model="item.article"
+                    placeholder="SEARCH"
+                    icon="ion-ios-medkit"
+                    cancel-label="CANCEL"
+                    filter-field="reference"
+                    items="articles"
+                    min-length="4"
+                >
+                </ion-autocomplete>
+                
                 <label class="item item-input  item-select">
                     <span class="input-label">Article</span>
                     <select ng-model="item.article" ng-options="client as client.nom for client in clients track by client.id"></select>
@@ -25,5 +44,3 @@
     </ion-content>
      
 </ion-view>
-
-

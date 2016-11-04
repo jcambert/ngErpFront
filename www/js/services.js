@@ -51,9 +51,9 @@ angular.module('ngErp')
                         optionsview.data=angular.extend({},data, {mode:'edit',nested:true});
                         optionsview.views={};
                         optionsview.views[view.name]={templateUrl:Paths.template+state+'/inner/'+nestedView.templateUrl+'.html'};
-                        console.dir('home.'+state+'-edit.'+nestedView.name);
-                        console.dir(nestedView);
-                        console.dir(optionsview);
+                        //console.dir('home.'+state+'-edit.'+nestedView.name);
+                        //console.dir(nestedView);
+                        //console.dir(optionsview);
                         $stateProvider.state('home.'+state+'-edit.'+nestedView.name,optionsview);
                     //});
                     
@@ -539,7 +539,7 @@ angular.module('ngErp')
     };
 }])
 
-.service('ChiffrageService',['sailsResource','toastr','$log','$q','$rootScope','ModeService',function(sailsResource,toastr,$log,$q,$rootScope,mode){
+.service('chiffrageService',['sailsResource','toastr','$log','$q','$rootScope','ModeService',function(sailsResource,toastr,$log,$q,$rootScope,mode){
      var $scope=null;//initialized by DataService or Manually
     var Article = sailsResource('article',{
         
@@ -548,9 +548,10 @@ angular.module('ngErp')
 
     
     this.init = function(){
+        console.dir('ChiffrageService init');
         if(!angular.isDefined($scope))return;
         if(mode.add())
-            this.getArticles().then(function(items){$scope.articles=items});
+            this.getArticles().then(function(items){$scope.articles=items/*_.map(items,'reference')*/;console.dir(items);});
         
     }
     
